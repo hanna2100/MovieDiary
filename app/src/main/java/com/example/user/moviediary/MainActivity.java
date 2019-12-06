@@ -11,6 +11,8 @@ import android.widget.FrameLayout;
 
 import com.example.user.moviediary.fragment.FrgMovieHome;
 import com.example.user.moviediary.fragment.FrgMovieSearchResult;
+import com.example.user.moviediary.fragment.FrgPosting;
+import com.example.user.moviediary.fragment.FrgUser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,8 +38,10 @@ public class MainActivity extends AppCompatActivity {
                         setChangeFragment(FrgMovieSearchResult.newInstance());
                         break;
                     case R.id.actionPosting:
+                        setChangeFragment(FrgPosting.newInstance());
                         break;
                     case R.id.actionUser:
+                        setChangeFragment(FrgUser.newInstance());
                         break;
                 }
                 return true;
