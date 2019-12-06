@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/actionHome"
+        android:enabled="true"
+        android:icon="@drawable/menu_home"
+        android:title="Home"/>
+
+    <item
+        android:id="@+id/actionSearch"
+        android:enabled="true"
+        android:icon="@drawable/menu_search"
+        android:title="Serach"/>
+
+    <item
+        android:id="@+id/actionPosting"
+        android:enabled="true"
+        android:icon="@drawable/menu_posting"
+        android:title="Add"/>
+
+    <item
+        android:id="@+id/actionUser"
+        android:enabled="true"
+        android:icon="@drawable/menu_user"
+        android:title="User"/>
+
+</menu>
