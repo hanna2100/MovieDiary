@@ -28,9 +28,9 @@ import android.widget.TextView;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieRcmAdapter;
-import com.example.user.moviediary.etc.MovieDetails;
-import com.example.user.moviediary.etc.MovieRecommendations;
-import com.example.user.moviediary.etc.MovieVideo;
+import com.example.user.moviediary.model.MovieDetails;
+import com.example.user.moviediary.model.MovieRecommendations;
+import com.example.user.moviediary.model.MovieVideo;
 import com.example.user.moviediary.util.GlideApp;
 import com.example.user.moviediary.util.MoviesRepository;
 import com.example.user.moviediary.util.OnGetDetailsCallback;
