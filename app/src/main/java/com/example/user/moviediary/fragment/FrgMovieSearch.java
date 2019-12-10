@@ -1,5 +1,6 @@
 package com.example.user.moviediary.fragment;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class FrgMovieSearch extends Fragment{
 
     private View view;
     private Context mContext;
+    private Activity mActivity;
 
     private MoviesRepository moviesRepository;
     private MovieSearchAdapter adapter;
@@ -55,6 +57,9 @@ public class FrgMovieSearch extends Fragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        if (context instanceof Activity){
+            this.mActivity=(Activity) context;
+        }
     }
 
     @Nullable
@@ -63,7 +68,7 @@ public class FrgMovieSearch extends Fragment{
         view = inflater.inflate(R.layout.fragment_movie_search, container, false);
 
         setHasOptionsMenu(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity)mActivity).getSupportActionBar().show();
 
         rcvSearch = view.findViewById(R.id.rcvSearch);
 
@@ -105,7 +110,7 @@ public class FrgMovieSearch extends Fragment{
         MenuItem movieSearch = menu.findItem(R.id.movieSearch);
         SearchView searchView = (SearchView) movieSearch.getActionView();
         SearchManager searchManager = (SearchManager) mContext.getSystemService(SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
         searchView.setQueryHint("영화제목을 입력하세요");
 
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -148,7 +153,7 @@ public class FrgMovieSearch extends Fragment{
                             @Override
                             public void onItemSelected(View v, int movieID) {
 
-                                ((MainActivity) getActivity()).setChangeFragment(FrgMovieDetails.newInstance(movieID));
+                                ((MainActivity)mActivity).setChangeFragment(FrgMovieDetails.newInstance(movieID));
 
                             }
                         });
