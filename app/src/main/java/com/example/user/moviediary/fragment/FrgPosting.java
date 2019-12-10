@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,9 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
         postingDate = view.findViewById(R.id.postingDate);
         edtReview = view.findViewById(R.id.edtReview);
 
+        //액션바 숨기기
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
         btnAddMovie.setOnClickListener(this);
         postingDate.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -91,8 +95,8 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
             case R.id.btnCancel:
                 // 입력한거 싹다 지워지게? 취소하시겠습니까? 라는 안내 창 띄워??
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("인사말").setMessage("반갑습니다");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setTitle("취소").setMessage("입력하신 내용이 지워집니다.");
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // 영화 포스터 자리 디폴트 이미지 필요,,
@@ -104,7 +108,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                     }
                 });
 
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Toast.makeText(getContext(), "Cancel Click", Toast.LENGTH_SHORT).show();
@@ -118,6 +122,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 float a = postingRatingBar.getRating();
                 Toast.makeText(getContext(), a + " ", Toast.LENGTH_SHORT).show();
                 // DB로 보내야함!
+                // 저장 버튼 누르고 게시물 작성 완료하면 마이페이지로 넘어가서 새 게시물 등록된거 보여줄가??
                 break;
         }
     }

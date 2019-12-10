@@ -1,4 +1,4 @@
-package com.example.user.moviediary.etc;
+package com.example.user.moviediary.model;
 
 import java.util.List;
 

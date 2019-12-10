@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +23,7 @@ import android.widget.Toast;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieSearchAdapter;
-import com.example.user.moviediary.etc.SearchResults;
+import com.example.user.moviediary.model.SearchResults;
 import com.example.user.moviediary.util.MoviesRepository;
 import com.example.user.moviediary.util.OnGetMoviesCallback;
 
@@ -33,7 +32,7 @@ import java.util.List;
 
 import static android.content.Context.SEARCH_SERVICE;
 
-public class FrgMovieSearch extends Fragment{
+public class FrgMovieSearch extends Fragment {
 
     private final String TAG = "SearchingMovie";
 
@@ -57,8 +56,8 @@ public class FrgMovieSearch extends Fragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (context instanceof Activity){
-            this.mActivity=(Activity) context;
+        if (context instanceof Activity) {
+            this.mActivity = (Activity) context;
         }
     }
 
@@ -68,7 +67,7 @@ public class FrgMovieSearch extends Fragment{
         view = inflater.inflate(R.layout.fragment_movie_search, container, false);
 
         setHasOptionsMenu(true);
-        ((AppCompatActivity)mActivity).getSupportActionBar().show();
+        ((AppCompatActivity) mActivity).getSupportActionBar().show();
 
         rcvSearch = view.findViewById(R.id.rcvSearch);
 
@@ -152,7 +151,7 @@ public class FrgMovieSearch extends Fragment{
                             @Override
                             public void onItemSelected(View v, int movieID) {
 
-                                ((MainActivity)mActivity).setChangeFragment(FrgMovieDetails.newInstance(movieID));
+                                ((MainActivity) mActivity).setChangeFragment(FrgMovieDetails.newInstance(movieID));
 
                             }
                         });

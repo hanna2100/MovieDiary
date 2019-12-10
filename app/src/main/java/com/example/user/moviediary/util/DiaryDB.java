@@ -16,6 +16,12 @@ public class DiaryDB extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
+        String query = "CREATE TABLE USER_TBL("+
+                "ID CHAR(20) not null,"+
+                "PW CHAR(20)," +
+                "NICKNAME CHAR())";
+        db.execSQL(query);
+
     }
 
     @Override

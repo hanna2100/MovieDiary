@@ -1,6 +1,5 @@
 package com.example.user.moviediary.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -12,8 +11,7 @@ import android.widget.TextView;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
-import com.example.user.moviediary.etc.MovieChart;
-import com.example.user.moviediary.etc.MovieRecommendations;
+import com.example.user.moviediary.model.MovieRecommendations;
 import com.example.user.moviediary.fragment.FrgMovieDetails;
 import com.example.user.moviediary.util.GlideApp;
 

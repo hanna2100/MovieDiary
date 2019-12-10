@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.moviediary.R;
-import com.example.user.moviediary.etc.MovieChart;
+import com.example.user.moviediary.model.MovieChart;
 import com.example.user.moviediary.util.GlideApp;
 
 import java.util.List;

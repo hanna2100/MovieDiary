@@ -1,6 +1,6 @@
 package com.example.user.moviediary.util;
 
-import com.example.user.moviediary.etc.SearchResults;
+import com.example.user.moviediary.model.SearchResults;
 
 import java.util.List;
 

@@ -2,13 +2,12 @@ package com.example.user.moviediary.util;
 
 import android.util.Log;
 
-import com.example.user.moviediary.etc.MovieDetails;
-import com.example.user.moviediary.etc.MovieLatest;
-import com.example.user.moviediary.etc.MoviePopular;
-import com.example.user.moviediary.etc.MovieRecommendations;
-import com.example.user.moviediary.etc.MovieVideo;
-import com.example.user.moviediary.etc.SearchResults;
-import com.example.user.moviediary.fragment.FrgMovieDetails;
+import com.example.user.moviediary.model.MovieDetails;
+import com.example.user.moviediary.model.MovieLatest;
+import com.example.user.moviediary.model.MoviePopular;
+import com.example.user.moviediary.model.MovieRecommendations;
+import com.example.user.moviediary.model.MovieVideo;
+import com.example.user.moviediary.model.SearchResults;
 
 import retrofit2.Call;
 import retrofit2.Callback;

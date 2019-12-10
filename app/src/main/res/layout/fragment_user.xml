@@ -17,14 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
-
             <TextView
                 android:id="@+id/userID"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="pyojihoon202"
+
+                android:text="pyojihoon202@naver.com"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
@@ -144,17 +144,13 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/user_film"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"/>
+                        android:src="@drawable/user_film" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="5dp"
-                        android:background="#bfbfbf"></LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -168,17 +164,13 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/user_heart"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"/>
+                        android:src="@drawable/user_heart" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#ededed"></LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
