@@ -7,16 +7,38 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieChartAdapter;
+import com.example.user.moviediary.adapter.MovieLatestAdapter;
+import com.example.user.moviediary.adapter.MovieSearchAdapter;
 import com.example.user.moviediary.etc.MovieChart;
+import com.example.user.moviediary.etc.MovieLatest;
+import com.example.user.moviediary.etc.MoviePopular;
+import com.example.user.moviediary.etc.MovieVideo;
+import com.example.user.moviediary.etc.SearchResults;
+import com.example.user.moviediary.util.GlideApp;
+import com.example.user.moviediary.util.MoviesRepository;
+import com.example.user.moviediary.util.OnGetLatestMoviesCallback;
+import com.example.user.moviediary.util.OnGetMoviesCallback;
+import com.example.user.moviediary.util.OnGetPopularMoviesCallback;
+import com.example.user.moviediary.util.OnGetVideoCallback;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,6 +47,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FrgMovieHome extends Fragment {
 
@@ -32,10 +55,23 @@ public class FrgMovieHome extends Fragment {
 
     private View view;
     private RecyclerView recyclerView;
+    private RecyclerView rcvLatestMovie;
     private LinearLayout layoutView;
+    private ScrollView scrollView;
+    private TextView tvPopularTitle, tvPopularOverview;
+    private Button btnPopularMore;
+    private ImageView ivPopularPoster;
+
     private ArrayList<MovieChart> list = new ArrayList<>();
+    private List<MovieLatest.ResultsBean> latestList = new ArrayList<>();
+
     private MovieChartAdapter adapter;
+    private MovieLatestAdapter latestAdapter;
     private LinearLayoutManager linearLayoutManager;
+    private LinearLayoutManager latestLayoutManager;
+    private MoviesRepository moviesRepository;
+    private MyTask mTask;
+    private boolean dataComplete;
 
     private Context mContext;
 
@@ -59,11 +95,30 @@ public class FrgMovieHome extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         layoutView = view.findViewById(R.id.layoutView);
+        scrollView = view.findViewById(R.id.scrollView);
+        ivPopularPoster = view.findViewById(R.id.ivPopularPoster);
+        tvPopularTitle = view.findViewById(R.id.tvPopularTitle);
+        tvPopularOverview = view.findViewById(R.id.tvPopularOverview);
+        btnPopularMore = view.findViewById(R.id.btnPopularMore);
+        rcvLatestMovie = view.findViewById(R.id.rcvLatestMovie);
 
-        new MyTask().execute();
+        moviesRepository = MoviesRepository.getInstance();
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        mTask = (MyTask) new MyTask().execute();
 
         return view;
 
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
+
+        super.onDestroy();
     }
 
     private class MyTask extends AsyncTask<Void, Void, Void> {
@@ -74,7 +129,7 @@ public class FrgMovieHome extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //진행다일로그 시작
+            //진행다이어로그 시작
             layoutView.setVisibility(View.INVISIBLE);
             progressDialog = new ProgressDialog(mContext);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -85,6 +140,30 @@ public class FrgMovieHome extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
+
+            getPopularMovieYoutubeFromTMDB();
+
+            crawlingCGVMovieChart();
+
+            getLatestMovieFromTMDB();
+
+            //영화정보를 모두 가져올때까지 기다림
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                    if (dataComplete == true)
+                        break;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            return null;
+
+        }
+
+        private void crawlingCGVMovieChart() {
 
             Document doc = null;
             try {
@@ -130,9 +209,86 @@ public class FrgMovieHome extends Fragment {
                 e.printStackTrace();
             }
 
-            return null;
-
         }
+
+        private void getPopularMovieYoutubeFromTMDB() {
+
+            //최신영화정보받기
+            moviesRepository.setPage(1);
+            moviesRepository.getPopularMovieList(new OnGetPopularMoviesCallback() {
+                @Override
+                public void onSuccess(List<MoviePopular.ResultsBean> resultsBeanList) {
+                    //총 20개의 인기영화를 받아오므로 20개중 하나를 랜덤으로 게시
+                    int randomPick = (int) (Math.random() * 20);
+                    Log.d("MovieDetails", "랜덤숫자=" + randomPick);
+                    MoviePopular.ResultsBean popularMovie = resultsBeanList.get(randomPick);
+
+                    getYoutubeMovieTrailer(popularMovie.getId(), popularMovie.getTitle()
+                            , popularMovie.getPoster_path(), popularMovie.getOverview());
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+
+        private void getYoutubeMovieTrailer(int movie_id, final String title
+                , final String posterPath, final String overView) {
+            moviesRepository.getMovieVideoResult(movie_id, new OnGetVideoCallback() {
+                @Override
+                public void onSuccess(final MovieVideo movieVideo) {
+
+                    String site = movieVideo.getResults().get(0).getSite();
+                    if (site.equals("YouTube")) {
+                        final String videoUrl = movieVideo.getResults().get(0).getKey();
+
+                        FrgYoutubePlayer youtubePlayer = FrgYoutubePlayer.newInstance(videoUrl);
+                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                        fragmentTransaction.add(R.id.flYoutube, youtubePlayer).commitAllowingStateLoss();
+
+                        String url = "https://image.tmdb.org/t/p/w92" + posterPath;
+                        GlideApp.with(view).load(url).centerCrop().into(ivPopularPoster);
+                        tvPopularOverview.setText(overView);
+                        tvPopularTitle.setText(title);
+                        dataComplete = true;
+
+                    } else {
+                        //유튜브 영화 트레일러가 없으면 다른영화를 다시찾음
+                        getPopularMovieYoutubeFromTMDB();
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    //유튜브 영화 트레일러가 없으면 다른영화를 다시찾음
+                    getPopularMovieYoutubeFromTMDB();
+                }
+            });
+        }
+
+        private void getLatestMovieFromTMDB() {
+            MoviesRepository.setPage(1);
+            moviesRepository.getLatestMovieList(new OnGetLatestMoviesCallback() {
+                @Override
+                public void onSuccess(List<MovieLatest.ResultsBean> resultsBeanList) {
+                    latestList = resultsBeanList;
+                    latestAdapter = new MovieLatestAdapter(R.layout.item_movie_latest, latestList);
+                    latestLayoutManager = new LinearLayoutManager(mContext);
+                    rcvLatestMovie.setLayoutManager(latestLayoutManager);
+                    rcvLatestMovie.setAdapter(latestAdapter);
+
+                }
+
+                @Override
+                public void onError() {
+
+                }
+
+            });
+        }
+
 
         @Override
         protected void onPostExecute(Void result) {
@@ -142,18 +298,25 @@ public class FrgMovieHome extends Fragment {
                     mContext, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.setLayoutManager(linearLayoutManager);
 
-
             //레이아웃 어댑터 설정
             adapter = new MovieChartAdapter(R.layout.item_movie_chart, list);
             recyclerView.setAdapter(adapter);
+
 
             //프로그레스바 제거
             progressDialog.dismiss();
             layoutView.setVisibility(View.VISIBLE);
 
+            //스크롤올리기
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.scrollTo(0, 0);
+                }
+            });
+
             super.onPostExecute(result);
         }
-
 
 
     }
