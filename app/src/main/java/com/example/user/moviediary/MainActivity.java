@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.example.user.moviediary.fragment.FrgMovieHome;
-import com.example.user.moviediary.fragment.FrgMovieSearchResult;
+import com.example.user.moviediary.fragment.FrgMovieSearch;
 import com.example.user.moviediary.fragment.FrgPosting;
 import com.example.user.moviediary.fragment.FrgUser;
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                         setChangeFragment(FrgMovieHome.newInstance());
                         break;
                     case R.id.actionSearch:
-                        setChangeFragment(FrgMovieSearchResult.newInstance());
+                        setChangeFragment(FrgMovieSearch.newInstance());
                         break;
                     case R.id.actionPosting:
                         setChangeFragment(FrgPosting.newInstance());
@@ -54,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
     public void setChangeFragment(Fragment fragment) {
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_right);
         fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
         fragmentTransaction.commit();
 
         return;

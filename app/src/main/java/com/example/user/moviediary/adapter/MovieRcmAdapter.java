@@ -48,7 +48,7 @@ public class MovieRcmAdapter extends RecyclerView.Adapter<MovieRcmAdapter.RcmVie
         rcmViewHolder.tvTitle.setText(resultsBean.getTitle());
         rcmViewHolder.tvVoteAvg.setText(resultsBean.getVote_average()+"");
 
-        String url = "https://image.tmdb.org/t/p/w300" + resultsBean.getBackdrop_path();
+        String url = "https://image.tmdb.org/t/p/w780" + resultsBean.getBackdrop_path();
         GlideApp.with(rcmViewHolder.itemView).load(url)
                 .centerCrop()
                 .into(rcmViewHolder.ivBackdrop);

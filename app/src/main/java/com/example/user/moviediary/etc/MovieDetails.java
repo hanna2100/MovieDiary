@@ -3,37 +3,38 @@ package com.example.user.moviediary.etc;
 import java.util.List;
 
 public class MovieDetails {
+
     /**
      * adult : false
-     * backdrop_path : /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
-     * belongs_to_collection : null
-     * budget : 63000000
-     * genres : [{"id":18,"name":"Drama"}]
-     * homepage :
-     * id : 550
-     * imdb_id : tt0137523
+     * backdrop_path : /7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg
+     * belongs_to_collection : {"id":86311,"name":"어벤져스 시리즈","poster_path":"/yFSIUVTCvgYrpalUktulvk3Gi5Y.jpg","backdrop_path":"/zuW6fOiusv4X9nnW3paHGfXcSll.jpg"}
+     * budget : 356000000
+     * genres : [{"id":12,"name":"모험"},{"id":878,"name":"SF"},{"id":28,"name":"액션"}]
+     * homepage : https://www.marvel.com/movies/avengers-endgame
+     * id : 299534
+     * imdb_id : tt4154796
      * original_language : en
-     * original_title : Fight Club
-     * overview : A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground "fight clubs" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.
-     * popularity : 0.5
-     * poster_path : null
-     * production_companies : [{"id":508,"logo_path":"/7PzJdsLGlR7oW4J0J5Xcd0pHGRg.png","name":"Regency Enterprises","origin_country":"US"},{"id":711,"logo_path":null,"name":"Fox 2000 Pictures","origin_country":""},{"id":20555,"logo_path":null,"name":"Taurus Film","origin_country":""},{"id":54050,"logo_path":null,"name":"Linson Films","origin_country":""},{"id":54051,"logo_path":null,"name":"Atman Entertainment","origin_country":""},{"id":54052,"logo_path":null,"name":"Knickerbocker Films","origin_country":""},{"id":25,"logo_path":"/qZCc1lty5FzX30aOCVRBLzaVmcp.png","name":"20th Century Fox","origin_country":"US"}]
+     * original_title : Avengers: Endgame
+     * overview : 어벤져스의 패배 이후 지구는 초토화됐고 남은 절반의 사람들은 정신적 고통을 호소하며 하루하루를 근근이 버텨나간다. 와칸다에서 싸우다 생존한 히어로들과 우주의 타이탄 행성에서 싸우다 생존한 히어로들이 뿔뿔이 흩어졌는데, 아이언맨과 네뷸라는 우주를 떠돌고 있고 지구에 남아 있는 어벤져스 멤버들은 닉 퓨리가 마지막에 신호를 보내다 만 송신기만 들여다보며 혹시 모를 우주의 응답을 기다리는 중이다. 애초 히어로의 삶을 잠시 내려놓고 가족과 시간을 보내던 호크아이 역시 헤아릴 수 없는 마음의 상처를 입은 채 사라지고 마는데...
+     * popularity : 42.56
+     * poster_path : /n78LK2t1uQP68Ud0VXHRe0HmKOp.jpg
+     * production_companies : [{"id":420,"logo_path":"/hUzeosd33nzE5MCNsZxCGEKTXaQ.png","name":"Marvel Studios","origin_country":"US"}]
      * production_countries : [{"iso_3166_1":"US","name":"United States of America"}]
-     * release_date : 1999-10-12
-     * revenue : 100853753
-     * runtime : 139
-     * spoken_languages : [{"iso_639_1":"en","name":"English"}]
+     * release_date : 2019-04-24
+     * revenue : 2797800564
+     * runtime : 181
+     * spoken_languages : [{"iso_639_1":"en","name":"English"},{"iso_639_1":"ja","name":"日本語"}]
      * status : Released
-     * tagline : How much can you know about yourself if you've never been in a fight?
-     * title : Fight Club
+     * tagline : 운명을 바꿀 최후의 전쟁이 펼쳐진다
+     * title : 어벤져스: 엔드게임
      * video : false
-     * vote_average : 7.8
-     * vote_count : 3439
+     * vote_average : 8.3
+     * vote_count : 10405
      */
 
     private boolean adult;
     private String backdrop_path;
-    private Object belongs_to_collection;
+    private BelongsToCollectionBean belongs_to_collection;
     private int budget;
     private String homepage;
     private int id;
@@ -42,9 +43,9 @@ public class MovieDetails {
     private String original_title;
     private String overview;
     private double popularity;
-    private Object poster_path;
+    private String poster_path;
     private String release_date;
-    private int revenue;
+    private long revenue;
     private int runtime;
     private String status;
     private String tagline;
@@ -73,11 +74,11 @@ public class MovieDetails {
         this.backdrop_path = backdrop_path;
     }
 
-    public Object getBelongs_to_collection() {
+    public BelongsToCollectionBean getBelongs_to_collection() {
         return belongs_to_collection;
     }
 
-    public void setBelongs_to_collection(Object belongs_to_collection) {
+    public void setBelongs_to_collection(BelongsToCollectionBean belongs_to_collection) {
         this.belongs_to_collection = belongs_to_collection;
     }
 
@@ -145,11 +146,11 @@ public class MovieDetails {
         this.popularity = popularity;
     }
 
-    public Object getPoster_path() {
+    public String getPoster_path() {
         return poster_path;
     }
 
-    public void setPoster_path(Object poster_path) {
+    public void setPoster_path(String poster_path) {
         this.poster_path = poster_path;
     }
 
@@ -161,11 +162,11 @@ public class MovieDetails {
         this.release_date = release_date;
     }
 
-    public int getRevenue() {
+    public long getRevenue() {
         return revenue;
     }
 
-    public void setRevenue(int revenue) {
+    public void setRevenue(long revenue) {
         this.revenue = revenue;
     }
 
@@ -257,10 +258,56 @@ public class MovieDetails {
         this.spoken_languages = spoken_languages;
     }
 
+    public static class BelongsToCollectionBean {
+        /**
+         * id : 86311
+         * name : 어벤져스 시리즈
+         * poster_path : /yFSIUVTCvgYrpalUktulvk3Gi5Y.jpg
+         * backdrop_path : /zuW6fOiusv4X9nnW3paHGfXcSll.jpg
+         */
+
+        private int id;
+        private String name;
+        private String poster_path;
+        private String backdrop_path;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getPoster_path() {
+            return poster_path;
+        }
+
+        public void setPoster_path(String poster_path) {
+            this.poster_path = poster_path;
+        }
+
+        public String getBackdrop_path() {
+            return backdrop_path;
+        }
+
+        public void setBackdrop_path(String backdrop_path) {
+            this.backdrop_path = backdrop_path;
+        }
+    }
+
     public static class GenresBean {
         /**
-         * id : 18
-         * name : Drama
+         * id : 12
+         * name : 모험
          */
 
         private int id;
@@ -285,9 +332,9 @@ public class MovieDetails {
 
     public static class ProductionCompaniesBean {
         /**
-         * id : 508
-         * logo_path : /7PzJdsLGlR7oW4J0J5Xcd0pHGRg.png
-         * name : Regency Enterprises
+         * id : 420
+         * logo_path : /hUzeosd33nzE5MCNsZxCGEKTXaQ.png
+         * name : Marvel Studios
          * origin_country : US
          */
 

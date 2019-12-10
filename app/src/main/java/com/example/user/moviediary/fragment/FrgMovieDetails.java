@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.user.moviediary.R;
@@ -56,6 +58,11 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     private TextView tvVoteAvg;
     private RatingBar ratingBar;
     private TextView tvOverviewRcm;
+    private ScrollView scrollView;
+    private ImageButton ibMore;
+    private ImageButton ibLess;
+
+    private MovieDetails currentMovieDetails;
 
     private View view;
     private Context mContext;
@@ -67,6 +74,8 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     private List<MovieRecommendations.ResultsBean> list;
     private DiscreteScrollView discreteRcm;
     private InfiniteScrollAdapter infiniteAdapter;
+
+    private MyTask mTask;
     private boolean dataComplete;
 
     public static FrgMovieDetails newInstance(int movie_id) {
@@ -89,8 +98,12 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_movie_details, container, false);
-        layoutView = view.findViewById(R.id.layoutView);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
+        scrollView = view.findViewById(R.id.scrollView);
+
+
+        layoutView = view.findViewById(R.id.layoutView);
         ivBackdrop = view.findViewById(R.id.ivBackdrop);
         ivPoster = view.findViewById(R.id.ivPoster);
         tvTitle = view.findViewById(R.id.tvTitle);
@@ -101,11 +114,40 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         ratingBar = view.findViewById(R.id.ratingBar);
         tvOverviewRcm = view.findViewById(R.id.tvOverviewRcm);
         Button btnPosting = view.findViewById(R.id.btnPosting);
+        ibMore = view.findViewById(R.id.ibMore);
+        ibLess = view.findViewById(R.id.ibLess);
+
+        ibMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvOverview.setMaxLines(Integer.MAX_VALUE);
+                ibLess.setVisibility(View.VISIBLE);
+                ibMore.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        ibLess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tvOverview.setMaxLines(5);
+                ibMore.setVisibility(View.VISIBLE);
+                ibLess.setVisibility(View.INVISIBLE);
+            }
+        });
 
         moviesRepository = MoviesRepository.getInstance();
 
-        new FrgMovieDetails.MyTask().execute();
+        mTask = (MyTask) new MyTask().execute();
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
+
+        super.onDestroy();
     }
 
     private void onMovieRcmChanged(MovieRecommendations.ResultsBean result) {
@@ -176,24 +218,10 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
             moviesRepository.getMovieDetailsResult(movie_id, new OnGetDetailsCallback() {
                 @Override
                 public void onSuccess(MovieDetails movieDetails) {
+                    currentMovieDetails = movieDetails;
 
-                    Log.d(TAG, "영상여부" + movieDetails.isVideo());
-
-                    tvTitle.setText(movieDetails.getTitle());
-                    tvRuntime.setText(movieDetails.getRuntime() + "min");
-                    tvRelease.setText(movieDetails.getRelease_date());
-                    tvVoteAvg.setText(String.valueOf(movieDetails.getVote_average()));
-                    ratingBar.setRating((float) movieDetails.getVote_average() / 2);
-                    tvOverview.setText(movieDetails.getOverview());
-
-                    String posterPath = "https://image.tmdb.org/t/p/w500" + movieDetails.getPoster_path();
-                    GlideApp.with(view).load(posterPath)
-                            .override(185, 260)
-                            .into(ivPoster);
-                    String backdropPath = "https://image.tmdb.org/t/p/w1280" + movieDetails.getBackdrop_path();
-                    GlideApp.with(view).load(backdropPath)
-                            .centerCrop()
-                            .into(ivBackdrop);
+                    //영화 상세정보 가져와서 뷰에 셋팅
+                    setMovieDetailsOnTheView();
 
                     //비디오 가져오기
                     getMovieUrlFromTMDB();
@@ -209,6 +237,56 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
                 }
             });
 
+
+        }
+
+        private void setMovieDetailsOnTheView() {
+
+            Log.d(TAG, "영상여부" + currentMovieDetails.isVideo());
+
+            tvTitle.setText(currentMovieDetails.getTitle());
+            tvRuntime.setText(currentMovieDetails.getRuntime() + "min");
+            tvRelease.setText(currentMovieDetails.getRelease_date());
+            tvVoteAvg.setText(String.valueOf(currentMovieDetails.getVote_average()));
+            ratingBar.setRating((float) currentMovieDetails.getVote_average() / 2);
+            if (currentMovieDetails.getOverview().equals("")) {
+                tvOverview.setText("줄거리가 없습니다.");
+
+            }else {
+                String overview =  currentMovieDetails.getOverview();
+                overview = overview.replace(" ", "\u00A0");
+                tvOverview.setText(overview);
+            }
+
+            //줄거리 더보기 설정 - 5줄 넘을때만 더보기 버튼 활성화
+            tvOverview.setMaxLines(Integer.MAX_VALUE);
+            tvOverview.post(new Runnable() {
+                @Override
+                public void run() {
+                    int lineCnt = tvOverview.getLineCount();
+                    if (lineCnt < 6) {
+                        ibMore.setVisibility(View.GONE);
+                    } else {
+                        tvOverview.setMaxLines(5);
+                        ibMore.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+            //포스터설정
+            if (currentMovieDetails.getPoster_path() != null) {
+                String posterPath = "https://image.tmdb.org/t/p/w500" + currentMovieDetails.getPoster_path();
+                GlideApp.with(view).load(posterPath)
+                        .override(185, 260)
+                        .into(ivPoster);
+            }
+
+            if (currentMovieDetails.getBackdrop_path() != null) {
+                String backdropPath = "https://image.tmdb.org/t/p/w1280" + currentMovieDetails.getBackdrop_path();
+                GlideApp.with(view).load(backdropPath)
+                        .centerCrop()
+                        .into(ivBackdrop);
+            }
 
         }
 
@@ -264,6 +342,7 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
 
                 @Override
                 public void onError() {
+                    tvOverviewRcm.setText("관련된 추천영화가 없습니다.");
                     dataComplete = true;
 
                 }
@@ -279,6 +358,12 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
             progressDialog.dismiss();
 
             dataComplete = false;
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.scrollTo(0, 0);
+                }
+            });
             super.onPostExecute(result);
         }
 
