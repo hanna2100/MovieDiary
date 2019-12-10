@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,9 +16,10 @@ import com.example.user.moviediary.etc.SearchResults;
 import com.example.user.moviediary.util.CharacterWrapTextView;
 import com.example.user.moviediary.util.GlideApp;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.SearchViewHolder> {
+public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.SearchViewHolder>{
 
     private List<SearchResults.ResultsBean> list;
     private int layout;
@@ -48,11 +51,13 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
         searchViewHolder.title.setText(searchResultBean.getTitle());
         searchViewHolder.overview.setText(searchResultBean.getOverview());
 
-        String url = "https://image.tmdb.org/t/p/w500" + searchResultBean.getPoster_path();
+        if (searchResultBean.getPoster_path()!=null) {
+            String url = "https://image.tmdb.org/t/p/w92" + searchResultBean.getPoster_path();
 
-        GlideApp.with(searchViewHolder.itemView).load(url)
-                .override(185,260)
-                .into(searchViewHolder.poster);
+            GlideApp.with(searchViewHolder.itemView).load(url)
+                    .centerCrop()
+                    .into(searchViewHolder.poster);
+        }
 
         //클릭이벤트
         searchViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +84,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
         return list != null ? list.size() : 0;
     }
 
-    public class SearchViewHolder extends RecyclerView.ViewHolder{
+    public class SearchViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         CharacterWrapTextView overview;
         ImageView poster;

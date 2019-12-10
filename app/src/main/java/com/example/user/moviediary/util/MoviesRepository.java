@@ -3,9 +3,12 @@ package com.example.user.moviediary.util;
 import android.util.Log;
 
 import com.example.user.moviediary.etc.MovieDetails;
+import com.example.user.moviediary.etc.MovieLatest;
+import com.example.user.moviediary.etc.MoviePopular;
 import com.example.user.moviediary.etc.MovieRecommendations;
 import com.example.user.moviediary.etc.MovieVideo;
 import com.example.user.moviediary.etc.SearchResults;
+import com.example.user.moviediary.fragment.FrgMovieDetails;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +23,7 @@ public class MoviesRepository {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private static final String LANGUAGE = "ko-KR";
     private static String query = "";
+    private static String region = "KR";
     private static int page = 1;
     private static boolean include_adult = false;
 
@@ -97,14 +101,18 @@ public class MoviesRepository {
             @Override
             public void onResponse(Call<MovieDetails> call, Response<MovieDetails> response) {
                 MovieDetails results = response.body();
-                if (results != null)
+                Log.d(TAG, "영화받기 onResponse = "+results.getId()+","+results.getTitle());
+                if (results != null) {
+                    Log.d(TAG, "영화받기 not null = "+results.getId()+","+results.getTitle());
                     callback.onSuccess(results);
+                }
                 else
                     callback.onError();
             }
 
             @Override
             public void onFailure(Call<MovieDetails> call, Throwable t) {
+                Log.d(TAG, "영화받기 onFailure = ");
                 callback.onError();
             }
         });
@@ -120,8 +128,10 @@ public class MoviesRepository {
 
             @Override
             public void onResponse(Call<MovieVideo> call, Response<MovieVideo> response) {
+
                 MovieVideo results = response.body();
-                if (results.getResults().size() != 0)
+
+                if(results!=null && results.getResults().size()!=0)
                     callback.onSuccess(results);
                 else
                     callback.onError();
@@ -140,20 +150,16 @@ public class MoviesRepository {
       추천영화 받기 메소드 시작 */
     public void getMovieRecommendations(int movie_id, final OnGetRecommendationsCallback callback) {
         Call<MovieRecommendations> call = api.getMovieRecommendations(movie_id, DeveloperKey.TMDB, LANGUAGE, page);
-        Log.d(TAG, "아이디"+movie_id);
         call.enqueue(new Callback<MovieRecommendations>() {
 
             @Override
             public void onResponse(Call<MovieRecommendations> call, Response<MovieRecommendations> response) {
-                Log.d(TAG, "데이터 받기 성공");
 
                 MovieRecommendations results = response.body();
 
-                if (results != null&& results.getResults() != null) {
-                    Log.d(TAG, "결과 널 아님");
+                if (results.getResults().size() != 0 && results.getResults() != null) {
                     callback.onSuccess(results.getResults());
                 } else {
-                    Log.d(TAG, "데이터받기 널");
                     callback.onError();
                 }
             }
@@ -166,4 +172,61 @@ public class MoviesRepository {
         });
 
     }
+    /* ~ 여기까지가 추천영화받기
+
+      인기영화받기 메소드 시작 */
+    public void getPopularMovieList(final OnGetPopularMoviesCallback callback) {
+        Call<MoviePopular> call = api.getMoviePopularList(DeveloperKey.TMDB, LANGUAGE, page, region);
+        call.enqueue(new Callback<MoviePopular>() {
+            @Override
+            public void onResponse(Call<MoviePopular> call, Response<MoviePopular> response) {
+
+                MoviePopular results = response.body();
+
+                if (results.getResults().size() != 0 && results.getResults() != null) {
+                    Log.d(TAG, results.getResults().toString());
+                    callback.onSuccess(results.getResults());
+                } else {
+                    callback.onError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MoviePopular> call, Throwable t) {
+                callback.onError();
+            }
+        });
+
+    }
+    /* ~ 여기까지가 인기영화받기
+
+  최신영화받기 메소드 시작 */
+    public void getLatestMovieList(final OnGetLatestMoviesCallback callback) {
+        Call<MovieLatest> call = api.getMovieLatestList(DeveloperKey.TMDB, LANGUAGE, page, region);
+        call.enqueue(new Callback<MovieLatest>() {
+            @Override
+            public void onResponse(Call<MovieLatest> call, Response<MovieLatest> response) {
+
+                MovieLatest results = response.body();
+
+                if (results.getResults().size() != 0 && results.getResults() != null) {
+                    Log.d(TAG, results.getResults().toString());
+                    Log.d(TAG, "토탈페이지 = "+results.getTotal_pages());
+                    Log.d(TAG, "전체결과 = "+results.getTotal_results());
+
+                    callback.onSuccess(results.getResults());
+                } else {
+                    callback.onError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieLatest> call, Throwable t) {
+                callback.onError();
+            }
+        });
+
+    }
+
+
 }

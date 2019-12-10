@@ -1,6 +1,8 @@
 package com.example.user.moviediary.util;
 
 import com.example.user.moviediary.etc.MovieDetails;
+import com.example.user.moviediary.etc.MovieLatest;
+import com.example.user.moviediary.etc.MoviePopular;
 import com.example.user.moviediary.etc.MovieRecommendations;
 import com.example.user.moviediary.etc.MovieVideo;
 import com.example.user.moviediary.etc.SearchResults;
@@ -41,6 +43,22 @@ public interface TMDBApi {
             @Query("api_key") String apiKey,
             @Query("language") String language,
             @Query("page") int page
+    );
+
+    @GET("movie/popular")
+    Call<MoviePopular> getMoviePopularList(
+            @Query("api_key") String apiKey,
+            @Query("language") String language,
+            @Query("page") int page,
+            @Query("region") String region
+    );
+
+    @GET("movie/now_playing")
+    Call<MovieLatest> getMovieLatestList(
+            @Query("api_key") String apiKey,
+            @Query("language") String language,
+            @Query("page") int page,
+            @Query("region") String region
     );
 
 }
