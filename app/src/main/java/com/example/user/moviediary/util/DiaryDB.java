@@ -1,31 +1,49 @@
 package com.example.user.moviediary.util;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
-public class DiaryDB extends SQLiteOpenHelper {
+public final class DiaryDB {
 
-    private static final String DB_NAME = "Diary";
-    private static final int VERSION = 1;
+    public static final class CreateUser implements BaseColumns{
 
-    public DiaryDB(Context context) {
-        super(context, DB_NAME, null, VERSION);
+        public static final String NICKNAME = "nickname";
+        public static final String PHOTO = "photo";
+        public static final String SLF_INT = "slf_int";
+        public static final String USER_TBL = "user_tbl";
+        public static final String CREATE_USR = "create table if not exists "
+                +USER_TBL+"("
+                +NICKNAME+" text primary key, "
+                +PHOTO+" text not null , "
+                +SLF_INT+" text );";
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
+    public static final class CreatePosting implements BaseColumns{
 
-        String query = "CREATE TABLE USER_TBL("+
-                "ID CHAR(20) not null,"+
-                "PW CHAR(20)," +
-                "NICKNAME CHAR())";
-        db.execSQL(query);
-
+        public static final String POSTING_TBL = "posting_tbl";
+        public static final String POST_NO = "post_no";
+        public static final String TITLE = "title";
+        public static final String MV_DATE = "mv_date";
+        public static final String POST_DATE = "post_date";
+        public static final String STAR = "star";
+        public static final String CONTENT = "content";
+        public static final String CREATE_POSTING = "create table if not exists "
+                +POSTING_TBL+"("
+                +POST_NO+" integer primary key autoincrement, "
+                +TITLE+" text not null , "
+                +MV_DATE+" text not null , "
+                +POST_DATE+" text not null , "
+                +STAR+" real not null , "
+                +CONTENT+" text not null);";
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public static final class CreateLike implements BaseColumns{
 
+        public static final String LIKE_TBL = "like_tbl";
+        public static final String LIKE_NO = "like_no";
+        public static final String TITLE = "title";
+        public static final String CREATE_LIKE = "create table if not exists "
+                +LIKE_TBL+"("
+                +LIKE_NO+" integer primary key autoincrement, "
+                +TITLE+" text not null);";
     }
 }
