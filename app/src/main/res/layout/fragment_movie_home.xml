@@ -81,7 +81,7 @@
 
                     </LinearLayout>
 
-                    <com.example.user.moviediary.util.CharacterWrapTextView
+                    <TextView
                         android:id="@+id/tvPopularOverview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

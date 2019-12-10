@@ -235,7 +235,7 @@ public class FrgMovieHome extends Fragment {
         }
 
         private void getYoutubeMovieTrailer(int movie_id, final String title
-                , final String posterPath, final String overView) {
+                , final String posterPath, final String overview) {
             moviesRepository.getMovieVideoResult(movie_id, new OnGetVideoCallback() {
                 @Override
                 public void onSuccess(final MovieVideo movieVideo) {
@@ -250,7 +250,8 @@ public class FrgMovieHome extends Fragment {
 
                         String url = "https://image.tmdb.org/t/p/w92" + posterPath;
                         GlideApp.with(view).load(url).centerCrop().into(ivPopularPoster);
-                        tvPopularOverview.setText(overView);
+                        String overviewReplace = overview.replace(" ", "\u00A0");
+                        tvPopularOverview.setText(overviewReplace);
                         tvPopularTitle.setText(title);
                         dataComplete = true;
 

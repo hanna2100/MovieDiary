@@ -271,7 +271,7 @@
                 app:dsv_orientation="horizontal" />
 
 
-            <com.example.user.moviediary.util.CharacterWrapTextView
+            <TextView
                 android:id="@+id/tvOverviewRcm"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"

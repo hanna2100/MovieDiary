@@ -6,17 +6,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.etc.SearchResults;
-import com.example.user.moviediary.util.CharacterWrapTextView;
 import com.example.user.moviediary.util.GlideApp;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.SearchViewHolder>{
@@ -89,7 +85,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
 
     public class SearchViewHolder extends RecyclerView.ViewHolder {
         TextView title;
-        CharacterWrapTextView overview;
+        TextView overview;
         ImageView poster;
 
         public SearchViewHolder(@NonNull View itemView) {
