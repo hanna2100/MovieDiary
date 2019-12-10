@@ -85,7 +85,6 @@ public class FrgMovieSearch extends Fragment{
                     moviesRepository.getSearchedMovieResult(new OnGetMoviesCallback() {
                         @Override
                         public void onSuccess(List<SearchResults.ResultsBean> resultsBeanList) {
-
                             list.addAll(resultsBeanList);
                             adapter.notifyDataSetChanged();
                         }

@@ -49,7 +49,10 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
         final SearchResults.ResultsBean searchResultBean = list.get(i);
 
         searchViewHolder.title.setText(searchResultBean.getTitle());
-        searchViewHolder.overview.setText(searchResultBean.getOverview());
+        String overview = searchResultBean.getOverview();
+        overview = overview.replace(" ", "\u00A0");
+        searchViewHolder.overview.setText(overview);
+
 
         if (searchResultBean.getPoster_path()!=null) {
             String url = "https://image.tmdb.org/t/p/w92" + searchResultBean.getPoster_path();
