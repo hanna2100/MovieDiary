@@ -20,6 +20,7 @@ public class MovieDiaryAdapter extends BaseAdapter {
     private ArrayList<MovieDiary> list;
     private LayoutInflater layoutInflater;
 
+    private MovieDiaryDetailAdapter movieDiaryDetailAdapter;
     public MovieDiaryAdapter(Context context, int layout, ArrayList<MovieDiary> list) {
         this.context = context;
         this.layout = layout;
@@ -51,6 +52,9 @@ public class MovieDiaryAdapter extends BaseAdapter {
         ImageView movieImage = convertView.findViewById(R.id.movieImage);
         final MovieDiary movieDiary = list.get(i);
         movieImage.setImageResource(movieDiary.getDetailImage());
+
+        movieDiaryDetailAdapter = new MovieDiaryDetailAdapter(R.layout.user_detail,list);
+
         movieImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

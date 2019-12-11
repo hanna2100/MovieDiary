@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -26,15 +28,16 @@ import com.example.user.moviediary.model.MovieDiary;
 
 import java.util.ArrayList;
 
-public class FrgMovieDiaryDetails extends Fragment implements View.OnClickListener {
-    private ImageView detailImage;
-    private TextView detailTitle;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class FrgMovieDiaryDetails extends Fragment {
+    private CircleImageView detailProfileImage;
+    private TextView detailNickname;
+    private ImageButton ibOption;
+    private ImageView detailPosterImage;
     private RatingBar detailRatingBar;
     private TextView detailDate;
-    private TextView detailReview;
-    private Button btnEdit;
-    private Button btnDelete;
-
+    private TextView detailContent;
 
     private Context mContext;
     private View view;
@@ -58,31 +61,44 @@ public class FrgMovieDiaryDetails extends Fragment implements View.OnClickListen
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = View.inflate(mContext, R.layout.user_detail, null);
-        detailImage = view.findViewById(R.id.detailImage);
-        detailTitle = view.findViewById(R.id.detailTitle);
+        detailProfileImage = view.findViewById(R.id.detailProfileImage);
+        detailNickname = view.findViewById(R.id.detailNickname);
+        ibOption = view.findViewById(R.id.ibOption);
+        detailPosterImage = view.findViewById(R.id.detailPosterImage);
         detailRatingBar = view.findViewById(R.id.detailRatingBar);
         detailDate = view.findViewById(R.id.detailDate);
-        detailReview = view.findViewById(R.id.detailReview);
-//        btnEdit = view.findViewById(R.id.btnEdit);
-//        btnDelete = view.findViewById(R.id.btnDelete);
+        detailContent = view.findViewById(R.id.detailContent);
 
-        btnEdit.setOnClickListener(this);
-        btnDelete.setOnClickListener(this);
+        ibOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 게시물 수정 삭제 메뉴 만들어줘야함
+                final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(mContext);
+                bottomSheetDialog.setContentView(R.layout.user_diary_dialog);
+                Button btnDiaryEdit = bottomSheetDialog.findViewById(R.id.btnDiaryEdit);
+                Button btnDiaryDelete = bottomSheetDialog.findViewById(R.id.btnDiaryDelete);
 
+                btnDiaryEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 수정버튼 이벤트
+                    }
+                });
+                btnDiaryDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 수정버튼 이벤트
+                    }
+                });
+                bottomSheetDialog.show();
+            }
+        });
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return view;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-//            case R.id.btnEdit : break;
-//            case R.id.btnDelete : break;
-        }
-
-    }
     // 목록에서 한 게시물을 클릭했을때 #이 붙은 해시태그가 있으면 색깔 변하게 해주고, 그 해시태그 클릭이벤트 해줘!
     private void setTags(TextView pTextView, String pTagString) {
         SpannableString string = new SpannableString(pTagString);
