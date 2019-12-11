@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_up_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_favorite_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="a6a9a1" />
-                            <entry key="outputName" value="ic_less" />
+                            <entry key="color" value="ea6b8a" />
+                            <entry key="height" value="50" />
+                            <entry key="outputName" value="ic_like" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\user" />
                             <entry key="width" value="50" />
