@@ -88,7 +88,7 @@
             <ImageView
                 android:layout_width="13dp"
                 android:layout_height="13dp"
-                android:src="@drawable/ic_heart"
+                android:src="@drawable/ic_unlike"
                 android:layout_marginRight="3dp"/>
 
             <TextView

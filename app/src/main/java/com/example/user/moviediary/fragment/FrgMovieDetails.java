@@ -1,7 +1,9 @@
 package com.example.user.moviediary.fragment;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,11 +28,13 @@ import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieRcmAdapter;
 import com.example.user.moviediary.model.MovieDetails;
 import com.example.user.moviediary.model.MovieRecommendations;
 import com.example.user.moviediary.model.MovieVideo;
+import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 import com.example.user.moviediary.util.MoviesRepository;
 import com.example.user.moviediary.util.OnGetDetailsCallback;
@@ -41,10 +45,11 @@ import com.yarolegovich.discretescrollview.DiscreteScrollView;
 import com.yarolegovich.discretescrollview.InfiniteScrollAdapter;
 import com.yarolegovich.discretescrollview.transform.ScaleTransformer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnItemChangedListener {
+public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnItemChangedListener, View.OnClickListener {
 
     private final String TAG = "MovieDetails";
     private static final String MOVIE_ID = "MOVIE_ID";
@@ -61,11 +66,14 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     private ScrollView scrollView;
     private ImageButton ibMore;
     private ImageButton ibLess;
+    private ImageButton ibLike;
+    private ImageButton ibUnlike;
 
     private MovieDetails currentMovieDetails;
 
     private View view;
     private Context mContext;
+    private Activity mActivity;
     private MoviesRepository moviesRepository;
     private LinearLayout layoutView;
     private FrameLayout flYoutube;
@@ -77,6 +85,8 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
 
     private MyTask mTask;
     private boolean dataComplete;
+
+    private DbOpenHelper dbOpenHelper;
 
     public static FrgMovieDetails newInstance(int movie_id) {
         FrgMovieDetails fragment = new FrgMovieDetails();
@@ -92,6 +102,9 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        if (context instanceof Activity) {
+            this.mActivity = (Activity) context;
+        }
     }
 
     @Nullable
@@ -101,7 +114,6 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         scrollView = view.findViewById(R.id.scrollView);
-
 
         layoutView = view.findViewById(R.id.layoutView);
         ivBackdrop = view.findViewById(R.id.ivBackdrop);
@@ -114,32 +126,94 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         ratingBar = view.findViewById(R.id.ratingBar);
         tvOverviewRcm = view.findViewById(R.id.tvOverviewRcm);
         Button btnPosting = view.findViewById(R.id.btnPosting);
+        ibLike = view.findViewById(R.id.ibLike);
+        ibUnlike = view.findViewById(R.id.ibUnlike);
         ibMore = view.findViewById(R.id.ibMore);
         ibLess = view.findViewById(R.id.ibLess);
 
-        ibMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tvOverview.setMaxLines(Integer.MAX_VALUE);
-                ibLess.setVisibility(View.VISIBLE);
-                ibMore.setVisibility(View.INVISIBLE);
-            }
-        });
+        dbOpenHelper = new DbOpenHelper(mContext);
 
-        ibLess.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tvOverview.setMaxLines(5);
-                ibMore.setVisibility(View.VISIBLE);
-                ibLess.setVisibility(View.INVISIBLE);
-            }
-        });
+        ibMore.setOnClickListener(this);
+        ibLess.setOnClickListener(this);
+        ibLike.setOnClickListener(this);
+        ibUnlike.setOnClickListener(this);
+        btnPosting.setOnClickListener(this);
 
         moviesRepository = MoviesRepository.getInstance();
 
         mTask = (MyTask) new MyTask().execute();
         return view;
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.ibMore:
+                tvOverview.setMaxLines(Integer.MAX_VALUE);
+                ibLess.setVisibility(View.VISIBLE);
+                ibMore.setVisibility(View.INVISIBLE);
+                break;
+
+            case R.id.ibLess:
+                tvOverview.setMaxLines(5);
+                ibMore.setVisibility(View.VISIBLE);
+                ibLess.setVisibility(View.INVISIBLE);
+                break;
+
+            case R.id.ibUnlike:
+                Log.d("DbData", "unlike클릭 -> 찜하기추가됨");
+                dbOpenHelper.openLike();
+                dbOpenHelper.createLikeHelper();
+                Log.d("DbData", "db열기완료");
+                //컬럼추가
+                dbOpenHelper.insertLikeColumn(movie_id, currentMovieDetails.getTitle()
+                        , currentMovieDetails.getPoster_path());
+                showDatabase("like_tbl", "mv_id");
+                dbOpenHelper.close();
+
+                ibUnlike.setVisibility(View.GONE);
+                ibLike.setVisibility(View.VISIBLE);
+                break;
+
+            case R.id.ibLike:
+                Log.d("DbData", "like클릭 -> 찜하기삭제됨");
+                dbOpenHelper.openLike();
+                dbOpenHelper.createLikeHelper();
+                Log.d("DbData", "db열기완료");
+                //컬럼삭제
+                dbOpenHelper.deleteLikeColumns(movie_id);
+                showDatabase("like_tbl", "mv_id");
+                dbOpenHelper.close();
+
+                ibLike.setVisibility(View.GONE);
+                ibUnlike.setVisibility(View.VISIBLE);
+                break;
+
+            case R.id.btnPosting:
+                ((MainActivity) mActivity).setChangeFragment(FrgPosting.newInstance(movie_id
+                        , currentMovieDetails.getTitle(), currentMovieDetails.getPoster_path()));
+                break;
+
+        }
+    }
+
+    public void showDatabase(String tbl_name, String sort){
+        Cursor iCursor = dbOpenHelper.sortColumn(tbl_name, sort);
+        Log.d("DbData", "DB Size: " + iCursor.getCount());
+
+        while(iCursor.moveToNext()){
+
+            int tempMvId = iCursor.getInt(iCursor.getColumnIndex("mv_id"));
+            String tempTitle = iCursor.getString(iCursor.getColumnIndex("title"));
+            String tempPoster = iCursor.getString(iCursor.getColumnIndex("mv_poster"));
+            String Result = tempMvId +", "+ tempTitle +", "+ tempPoster;
+
+            Log.d("DbData", Result);
+        }
+
+    }
+
 
     @Override
     public void onDestroy() {
@@ -164,6 +238,7 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         onMovieRcmChanged(list.get(positionInDataSet));
     }
 
+
     private class MyTask extends AsyncTask<Void, Void, Void> {
 
         //진행바표시
@@ -186,7 +261,6 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
 
             tvNotFoundVideo = view.findViewById(R.id.tvNotFoundVideo);
             flYoutube = view.findViewById(R.id.flYoutube);
-            ImageButton ibLike = view.findViewById(R.id.ibLike);
 
             //포스터 이미지뷰 모서리 둥글게
             GradientDrawable drawable =
@@ -220,6 +294,9 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
                 public void onSuccess(MovieDetails movieDetails) {
                     currentMovieDetails = movieDetails;
 
+                    //db에서 해당영화가 찜목록에 있는지 확인(like버튼 visible setting)
+                    likeButtonVisibleSetting();
+
                     //영화 상세정보 가져와서 뷰에 셋팅
                     setMovieDetailsOnTheView();
 
@@ -238,6 +315,24 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
             });
 
 
+        }
+
+        private void likeButtonVisibleSetting() {
+            Log.d("DbData", "like클릭 -> 찜하기삭제됨");
+            dbOpenHelper.openLike();
+            dbOpenHelper.createLikeHelper();
+            Log.d("DbData", "db열기완료");
+            //찜하기 목록에 있는지 여부 검사
+            boolean isExistLike = dbOpenHelper.isExistLikeColumn(movie_id);
+            dbOpenHelper.close();
+
+            if(isExistLike) {
+                ibLike.setVisibility(View.VISIBLE);
+                ibUnlike.setVisibility(View.GONE);
+            }else{
+                ibLike.setVisibility(View.GONE);
+                ibUnlike.setVisibility(View.VISIBLE);
+            }
         }
 
         private void setMovieDetailsOnTheView() {

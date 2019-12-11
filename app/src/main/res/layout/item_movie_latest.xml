@@ -108,7 +108,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_heart" />
+                android:src="@drawable/ic_unlike" />
 
             <ImageButton
                 android:id="@+id/btnComments"
@@ -126,7 +126,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_heart" />
+                    android:src="@drawable/ic_unlike" />
 
                 <TextSwitcher
                     android:id="@+id/tvLikesCount"

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                         setChangeFragment(FrgMovieSearch.newInstance());
                         break;
                     case R.id.actionPosting:
-                        setChangeFragment(FrgPosting.newInstance());
+                        setChangeFragment(FrgPosting.newInstance(0, null, null));
                         break;
                     case R.id.actionUser:
                         setChangeFragment(FrgUser.newInstance());
