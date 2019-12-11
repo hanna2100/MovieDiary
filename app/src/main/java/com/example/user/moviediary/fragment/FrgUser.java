@@ -98,9 +98,6 @@ public class FrgUser extends Fragment implements View.OnClickListener {
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        // 테스트용!
-        list.add(new MovieDiary(R.drawable.bring_me_home, "나를 찾아줘", 4.5f, "2019.12.08",
-                "아유 하기싫어 #하동운바보 #귀여운도담이 집에 갈래"));
 
         movieDiaryAdapter = new MovieDiaryAdapter(getContext(), R.layout.item_user, list);
         diaryCount.setText(String.valueOf(list.size()));

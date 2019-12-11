@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
 import java.util.Calendar;
@@ -41,9 +45,14 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
 
     private int movie_id;
 
+    // 포스터 이미지 uri 저장하는 변수
+    private String posterPath;
+
     private Context mContext;
     private Activity mActivity;
     private View view;
+
+    private DbOpenHelper dbOpenHelper;
 
     public static FrgPosting newInstance(int movie_id, String title, String poster_path) {
         FrgPosting fragment = new FrgPosting();
@@ -84,6 +93,8 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
         //영화제목, 포스터 자동세팅
         autoSettingTitleAndPoster();
 
+        dbOpenHelper= new DbOpenHelper(mContext);
+
         btnAddMovie.setOnClickListener(this);
         postingDate.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -99,11 +110,12 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
 
         //포스터설정
         if (poster_path != null) {
-            String posterPath = "https://image.tmdb.org/t/p/w500" + poster_path;
+            posterPath = "https://image.tmdb.org/t/p/w500" + poster_path;
             GlideApp.with(view).load(posterPath)
                     .fitCenter()
                     .into(postingImage);
         }
+
 
         //제목설정
         postingTitle.setText(movie_title);
@@ -127,20 +139,20 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 DatePickerDialog dpd = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        postingDate.setText(year + "." + (month + 1) + "." + dayOfMonth);
+                        postingDate.setText(year + "-" + (month + 1) + "-" + dayOfMonth);
                     }
                 }, y, m, d); // 기본값 연월일
                 dpd.show();
                 break;
             case R.id.btnCancel:
-                // 입력한거 싹다 지워지게? 취소하시겠습니까? 라는 안내 창 띄워??
+                // 취소 재확인 다이얼로그 띄움
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("취소").setMessage("입력하신 내용이 지워집니다.");
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // 영화 포스터 자리 디폴트 이미지 필요,,
-                        // postingImage.setImageResource();
+
+                        postingImage.setImageResource(R.drawable.movie_no_poster);
                         postingRatingBar.setRating(3.0f);
                         postingTitle.setText("");
                         postingDate.setText("이 곳을 눌러 날짜를 선택하세요.");
@@ -159,11 +171,49 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 alertDialog.show();
                 break;
             case R.id.btnSave:
-                float a = postingRatingBar.getRating();
-                Toast.makeText(getContext(), a + " ", Toast.LENGTH_SHORT).show();
+                // 현재 날짜 가져오기
+                Calendar post_date = Calendar.getInstance();
+                int post_date_y = post_date.get(Calendar.YEAR);
+                int post_date_m = post_date.get(Calendar.MONTH);
+                int post_date_d = post_date.get(Calendar.DAY_OF_MONTH);
+
+                String postDate = post_date_y + "-" + post_date_m + "-" + post_date_d;
+
+                dbOpenHelper.openPosting();
+                dbOpenHelper.createPostingHelper();
+                dbOpenHelper.insertPostingColumn(movie_id, postingTitle.getText().toString().trim(),
+                        posterPath, postingDate.getText().toString().trim(),
+                        postDate, postingRatingBar.getRating(), edtReview.getText().toString().trim());
+
+                showDatabase("posting_tbl", "mv_id");
+
+                dbOpenHelper.close();
+
                 // DB로 보내야함!
                 // 저장 버튼 누르고 게시물 작성 완료하면 마이페이지로 넘어가서 새 게시물 등록된거 보여줄가??
                 break;
         }
     }
+
+    public void showDatabase(String tbl_name, String sort) {
+        Cursor iCursor = dbOpenHelper.sortColumn(tbl_name, sort);
+        Log.d("DbData", "DB Size: " + iCursor.getCount());
+
+        while (iCursor.moveToNext()) {
+
+            int tempMvId = iCursor.getInt(iCursor.getColumnIndex("mv_id"));
+            String tempTitle = iCursor.getString(iCursor.getColumnIndex("title"));
+            String tempPoster = iCursor.getString(iCursor.getColumnIndex("mv_poster"));
+            String tempMovieDate = iCursor.getString(iCursor.getColumnIndex("mv_date"));
+            String tempPostingDate = iCursor.getString(iCursor.getColumnIndex("post_date"));
+            float tempStar = iCursor.getFloat(iCursor.getColumnIndex("star"));
+            String tempContent = iCursor.getString(iCursor.getColumnIndex("content"));
+
+            String Result = tempMvId + ", " + tempTitle + ", " + tempPoster +
+                    tempMovieDate + ", " + tempPostingDate + ", " + tempStar + ", " + tempContent;
+
+            Log.d("DbData", Result);
+        }
+    }
+
 }
