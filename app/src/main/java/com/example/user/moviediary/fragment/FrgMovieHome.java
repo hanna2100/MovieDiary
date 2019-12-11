@@ -1,5 +1,6 @@
 package com.example.user.moviediary.fragment;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieChartAdapter;
 import com.example.user.moviediary.adapter.MovieLatestAdapter;
@@ -43,7 +45,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FrgMovieHome extends Fragment {
+public class FrgMovieHome extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "Parsing";
 
@@ -58,6 +60,7 @@ public class FrgMovieHome extends Fragment {
 
     private ArrayList<MovieChart> list = new ArrayList<>();
     private List<MovieLatest.ResultsBean> latestList = new ArrayList<>();
+    private int popularMovieId;
 
     private MovieChartAdapter adapter;
     private MovieLatestAdapter latestAdapter;
@@ -68,6 +71,7 @@ public class FrgMovieHome extends Fragment {
     private boolean dataComplete;
 
     private Context mContext;
+    private Activity mActivity;
 
     public static FrgMovieHome newInstance() {
         FrgMovieHome fragment = new FrgMovieHome();
@@ -80,6 +84,9 @@ public class FrgMovieHome extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        if (context instanceof Activity) {
+            this.mActivity = (Activity) context;
+        }
     }
 
     @Nullable
@@ -100,10 +107,29 @@ public class FrgMovieHome extends Fragment {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
+        btnPopularMore.setOnClickListener(this);
+        ivPopularPoster.setOnClickListener(this);
+
         mTask = (MyTask) new MyTask().execute();
 
         return view;
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.btnPopularMore:
+                ((MainActivity) mActivity).setChangeFragment(FrgMovieDetails.newInstance(popularMovieId));
+                break;
+
+            case R.id.ivPopularPoster:
+                ((MainActivity) mActivity).setChangeFragment(FrgMovieDetails.newInstance(popularMovieId));
+                break;
+
+
+        }
     }
 
     @Override
@@ -247,6 +273,8 @@ public class FrgMovieHome extends Fragment {
                         String overviewReplace = overview.replace(" ", "\u00A0");
                         tvPopularOverview.setText(overviewReplace);
                         tvPopularTitle.setText(title);
+
+                        popularMovieId = movieVideo.getId();
                         dataComplete = true;
 
                     } else {

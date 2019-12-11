@@ -20,6 +20,7 @@
         >
         <activity
             android:name=".MainActivity"
+            android:theme="@style/AppThemeDarkActionBar"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
