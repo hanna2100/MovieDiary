@@ -115,7 +115,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btnAddMovie:
                 // 버튼 누르면 검색화면 뜨게 함!
-                ((MainActivity) mActivity).setChangeFragment(FrgMovieSearch.newInstance());
+                ((MainActivity) mActivity).setChangeFragment(FrgMovieSearch.newInstance(true));
                 break;
             case R.id.postingDate:
                 // 현재 날짜 가져오기

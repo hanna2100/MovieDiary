@@ -35,6 +35,7 @@ import static android.content.Context.SEARCH_SERVICE;
 public class FrgMovieSearch extends Fragment {
 
     private final String TAG = "SearchingMovie";
+    private static final String IS_POSTING_FRG = "IS_POSTING_FRG";
 
     private View view;
     private Context mContext;
@@ -45,9 +46,12 @@ public class FrgMovieSearch extends Fragment {
     private List<SearchResults.ResultsBean> list;
     private RecyclerView rcvSearch;
 
-    public static FrgMovieSearch newInstance() {
+    private boolean isPostingFrg;
+
+    public static FrgMovieSearch newInstance(boolean isPostingFrg) {
         FrgMovieSearch fragment = new FrgMovieSearch();
         Bundle args = new Bundle();
+        args.putBoolean(IS_POSTING_FRG, isPostingFrg);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,6 +72,8 @@ public class FrgMovieSearch extends Fragment {
 
         setHasOptionsMenu(true);
         ((AppCompatActivity) mActivity).getSupportActionBar().show();
+
+        isPostingFrg = getArguments().getBoolean(IS_POSTING_FRG);
 
         rcvSearch = view.findViewById(R.id.rcvSearch);
 
@@ -149,10 +155,12 @@ public class FrgMovieSearch extends Fragment {
                 adapter = new MovieSearchAdapter(R.layout.item_movie_search, list,
                         new MovieSearchAdapter.OnItemSelectedInterface() {
                             @Override
-                            public void onItemSelected(View v, int movieID) {
+                            public void onItemSelected(View v, int movieID, String movieTitle, String moviePosterPath) {
 
-                                ((MainActivity) mActivity).setChangeFragment(FrgMovieDetails.newInstance(movieID));
-
+                                if (isPostingFrg)
+                                    ((MainActivity) mActivity).setChangeFragment(FrgPosting.newInstance(movieID, movieTitle, moviePosterPath));
+                                else
+                                    ((MainActivity) mActivity).setChangeFragment(FrgMovieDetails.newInstance(movieID));
                             }
                         });
                 rcvSearch.setAdapter(adapter);

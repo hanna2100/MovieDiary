@@ -63,7 +63,9 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
             @Override
             public void onClick(View v) {
                 int movieID = searchResultBean.getId();
-                mListener.onItemSelected(v, movieID);
+                String movieTitle = searchResultBean.getTitle();
+                String moviePosterPath = searchResultBean.getPoster_path();
+                mListener.onItemSelected(v, movieID, movieTitle, moviePosterPath);
 
             }
         });
@@ -72,7 +74,9 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
             @Override
             public void onClick(View v) {
                 int movieID = searchResultBean.getId();
-                mListener.onItemSelected(v, movieID);
+                String movieTitle = searchResultBean.getTitle();
+                String moviePosterPath = searchResultBean.getPoster_path();
+                mListener.onItemSelected(v, movieID, movieTitle, moviePosterPath);
 
             }
         });
@@ -97,7 +101,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<MovieSearchAdapter.
     }
 
     public interface OnItemSelectedInterface {
-        void onItemSelected(View v, int movieID);
+        void onItemSelected(View v, int movieID, String movieTitle, String moviePosterPath);
     }
 
 }
