@@ -17,6 +17,8 @@ import com.example.user.moviediary.fragment.FrgPosting;
 import com.example.user.moviediary.fragment.FrgUser;
 import com.example.user.moviediary.fragment.ThemeColors;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
 
     ThemeColors themeColors;

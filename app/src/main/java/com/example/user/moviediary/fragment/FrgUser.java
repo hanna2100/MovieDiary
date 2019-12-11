@@ -1,6 +1,7 @@
 package com.example.user.moviediary.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,7 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -28,12 +31,15 @@ import com.example.user.moviediary.adapter.MovieDiaryAdapter;
 import com.example.user.moviediary.model.MovieDiary;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FrgUser extends Fragment implements View.OnClickListener {
+public class FrgUser extends Fragment implements View.OnClickListener, View.OnTouchListener {
     private DrawerLayout mainLayout;
     private LinearLayout drawerLayout;
+    private Button btnTheme, btnMail;
+
 
     //탭 레이아웃 선택시 효과 주기위한 레이아웃 변수
     private LinearLayout diaryTabSelect;
@@ -64,19 +70,31 @@ public class FrgUser extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof MainActivity ){
+            Log.d("FrgUser","Context=MainActivity");
+        }
+
         mContext = context;
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.fragment_user, container, false);
+        new ThemeColors(mContext);
 
         mainLayout = view.findViewById(R.id.mainLayout);
         drawerLayout = view.findViewById(R.id.drawerLayout);
         ibSetting = view.findViewById(R.id.ibSetting);
         ibDiary = view.findViewById(R.id.ibDiary);
         ibWish = view.findViewById(R.id.ibWish);
+
+        btnTheme = view.findViewById(R.id.btnTheme);
+        btnMail = view.findViewById(R.id.btnMail);
 
         userID = view.findViewById(R.id.userID);
         diaryCount = view.findViewById(R.id.diaryCount);
@@ -142,9 +160,38 @@ public class FrgUser extends Fragment implements View.OnClickListener {
         btnEditProfile.setOnClickListener(this);
         ibDiary.setOnClickListener(this);
         ibWish.setOnClickListener(this);
+        btnTheme.setOnClickListener(this);
+        btnMail.setOnClickListener(this);
+        drawerLayout.setOnTouchListener(this);
+        mainLayout.setDrawerListener(listener);
 
         return view;
     }
+
+    DrawerLayout.DrawerListener listener=new DrawerLayout.DrawerListener(){
+
+        @Override
+        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+        }
+
+        @Override
+        public void onDrawerOpened(@NonNull View drawerView) {
+
+        }
+
+        @Override
+        public void onDrawerClosed(@NonNull View drawerView) {
+
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+
+        }
+
+    };
+
 
     @Override
     public void onClick(View v) {
@@ -166,7 +213,37 @@ public class FrgUser extends Fragment implements View.OnClickListener {
                 diaryTabSelect.setVisibility(View.INVISIBLE);
                 wishTabSelect.setVisibility(View.VISIBLE);
                 break;
+
+            case R.id.btnTheme:
+
+                int red= new Random().nextInt(255);
+                int green= new Random().nextInt(255);
+                int blue= new Random().nextInt(255);
+                //ThemeColors.setNewThemeColor((MainActivity) mContext, red, green, blue);
+                ThemeColors.setNewThemeColor((MainActivity)mContext, red, green, blue);
+                break;
+
+            case R.id.btnMail:
+
+                mainLayout.closeDrawer(drawerLayout);
+
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.setType("plain/text");
+                // email setting 배열로 해놔서 복수 발송 가능
+                String[] address = {"space@kokoboa.com"};
+                email.putExtra(Intent.EXTRA_EMAIL, address);
+                email.putExtra(Intent.EXTRA_SUBJECT,"문의 사항");
+                email.putExtra(Intent.EXTRA_TEXT,"개발자님께 문의 및 의견 사항이 있어 메일을 보냅니다.\n");
+                startActivity(email);
+
+                break;
+
+
         }
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        return true;
+    }
 }
