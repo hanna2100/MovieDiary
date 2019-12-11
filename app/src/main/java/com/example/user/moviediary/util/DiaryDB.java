@@ -20,15 +20,17 @@ public final class DiaryDB {
     public static final class CreatePosting implements BaseColumns{
 
         public static final String POSTING_TBL = "posting_tbl";
-        public static final String POST_NO = "post_no";
+        public static final String MV_ID = "mv_id";
         public static final String TITLE = "title";
-        public static final String MV_DATE = "mv_date";
-        public static final String POST_DATE = "post_date";
+        public static final String MV_POSTER = "mv_poster";
+        public static final String MV_DATE = "mv_date"; //영화본날짜
+        public static final String POST_DATE = "post_date"; //포스팅한날짜
         public static final String STAR = "star";
         public static final String CONTENT = "content";
         public static final String CREATE_POSTING = "create table if not exists "
                 +POSTING_TBL+"("
-                +POST_NO+" integer primary key autoincrement, "
+                +MV_ID+" integer primary key, "
+                +MV_POSTER+"text not null"
                 +TITLE+" text not null , "
                 +MV_DATE+" text not null , "
                 +POST_DATE+" text not null , "
@@ -39,11 +41,13 @@ public final class DiaryDB {
     public static final class CreateLike implements BaseColumns{
 
         public static final String LIKE_TBL = "like_tbl";
-        public static final String LIKE_NO = "like_no";
         public static final String TITLE = "title";
+        public static final String MV_ID = "mv_id";
+        public static final String MV_POSTER = "mv_poster";
         public static final String CREATE_LIKE = "create table if not exists "
                 +LIKE_TBL+"("
-                +LIKE_NO+" integer primary key autoincrement, "
-                +TITLE+" text not null);";
+                +MV_ID+" integer primary key, "
+                +TITLE+" text not null, "
+                +MV_POSTER+" text not null);";
     }
 }
