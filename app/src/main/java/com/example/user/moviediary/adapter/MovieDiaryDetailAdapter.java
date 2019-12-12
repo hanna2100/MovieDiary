@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,9 @@ public class MovieDiaryDetailAdapter extends RecyclerView.Adapter<MovieDiaryDeta
     private int layout;
     private View view;
     private Context context;
+
+    // 영화 이미지 세팅 변수
+    private String posterPath;
 
     public MovieDiaryDetailAdapter(int layout, ArrayList<MovieDiary> list) {
         this.list = list;
@@ -51,7 +55,13 @@ public class MovieDiaryDetailAdapter extends RecyclerView.Adapter<MovieDiaryDeta
         // 유저 정보에서 따와야함!
         // detailViewHolder.detailProfileImage.setImageResource();
         // detailViewHolder.detailNickname.setText();
-        detailViewHolder.detailPosterImage.setImageResource(list.get(i).getDetailImage());
+
+
+        posterPath = list.get(i).getDetailImage();
+        GlideApp.with(view).load(posterPath)
+                .fitCenter()
+                .into(detailViewHolder.detailPosterImage);
+
         detailViewHolder.detailRatingBar.setRating(list.get(i).getDetailRatingBar());
         detailViewHolder.detailDate.setText(list.get(i).getDetailDate());
 
@@ -59,7 +69,7 @@ public class MovieDiaryDetailAdapter extends RecyclerView.Adapter<MovieDiaryDeta
 
         String detailTitle = list.get(i).getDetailTitle();
         String detailContent = list.get(i).getDetailReview();
-        String str = detailTitle+"  "+detailContent;
+        String str = detailTitle + "  " + detailContent;
 
         str = str.replace(" ", "\u00A0");
 
@@ -83,7 +93,7 @@ public class MovieDiaryDetailAdapter extends RecyclerView.Adapter<MovieDiaryDeta
         public ImageView detailPosterImage;
         public RatingBar detailRatingBar;
         public TextView detailDate;
-        public TextView  detailContent;
+        public TextView detailContent;
 
         public DetailViewHolder(@NonNull View itemView) {
             super(itemView);

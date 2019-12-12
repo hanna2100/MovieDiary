@@ -28,9 +28,9 @@ public final class DiaryDB {
         public static final String STAR = "star";
         public static final String CONTENT = "content";
         public static final String CREATE_POSTING = "create table if not exists "
-                +POSTING_TBL+"("
+                +POSTING_TBL+" ("
                 +MV_ID+" integer primary key, "
-                +MV_POSTER+"text not null"
+                +MV_POSTER+" text not null, "
                 +TITLE+" text not null , "
                 +MV_DATE+" text not null , "
                 +POST_DATE+" text not null , "

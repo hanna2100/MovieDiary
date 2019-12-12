@@ -1,6 +1,7 @@
 package com.example.user.moviediary.fragment;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,9 +23,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.util.DbOpenHelper;
+import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
 
@@ -43,6 +47,8 @@ public class FrgMovieDiaryDetails extends Fragment {
     private View view;
 
     private ArrayList<MovieDiary> list;
+
+    private DbOpenHelper dbOpenHelper;
 
     public static FrgMovieDiaryDetails newInstance() {
         FrgMovieDiaryDetails fragment = new FrgMovieDiaryDetails();
@@ -68,6 +74,20 @@ public class FrgMovieDiaryDetails extends Fragment {
         detailRatingBar = view.findViewById(R.id.detailRatingBar);
         detailDate = view.findViewById(R.id.detailDate);
         detailContent = view.findViewById(R.id.detailContent);
+
+        dbOpenHelper = new DbOpenHelper(mContext);
+
+        insertList();
+
+        for (int i=0;i<list.size();i++) {
+
+            GlideApp.with(mContext).load(list.get(i).getDetailImage()).into(detailPosterImage);
+            detailRatingBar.setRating(list.get(i).getDetailRatingBar());
+            detailDate.setText(list.get(i).getDetailDate());
+            detailContent.setText(list.get(i).getDetailTitle() + "  " + list.get(i).getDetailReview());
+        }
+
+        setTags(detailContent, detailContent.getText().toString());
 
         ibOption.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,5 +158,24 @@ public class FrgMovieDiaryDetails extends Fragment {
 
         pTextView.setMovementMethod(LinkMovementMethod.getInstance());
         pTextView.setText(string);
+    }
+
+
+    private void insertList() {
+        dbOpenHelper.openPosting();
+        dbOpenHelper.createPostingHelper();
+        Cursor cursor = dbOpenHelper.selectPostingColumns();
+
+        while (cursor.moveToNext()) {
+            int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+            String tempTitle = cursor.getString(cursor.getColumnIndex("title"));
+            String tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
+            String tempMovieDate = cursor.getString(cursor.getColumnIndex("mv_date"));
+            String tempPostingDate = cursor.getString(cursor.getColumnIndex("post_date"));
+            float tempStar = cursor.getFloat(cursor.getColumnIndex("star"));
+            String tempContent = cursor.getString(cursor.getColumnIndex("content"));
+
+            list.add(new MovieDiary(tempPoster, tempTitle, tempStar, tempMovieDate, tempContent));
+        }
     }
 }

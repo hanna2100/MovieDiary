@@ -1,13 +1,15 @@
 package com.example.user.moviediary.model;
 
+import java.io.Serializable;
+
 public class MovieDiary {
-    private int detailImage;
+    private String detailImage;
     private String detailTitle;
     private float detailRatingBar;
     private String detailDate;
     private String detailReview;
 
-    public MovieDiary(int detailImage, String detailTitle, float detailRatingBar, String detailDate, String detailReview) {
+    public MovieDiary(String detailImage, String detailTitle, float detailRatingBar, String detailDate, String detailReview) {
         this.detailImage = detailImage;
         this.detailTitle = detailTitle;
         this.detailRatingBar = detailRatingBar;
@@ -15,11 +17,11 @@ public class MovieDiary {
         this.detailReview = detailReview;
     }
 
-    public int getDetailImage() {
+    public String getDetailImage() {
         return detailImage;
     }
 
-    public void setDetailImage(int detailImage) {
+    public void setDetailImage(String detailImage) {
         this.detailImage = detailImage;
     }
 

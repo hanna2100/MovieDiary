@@ -116,7 +116,6 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                     .into(postingImage);
         }
 
-
         //제목설정
         postingTitle.setText(movie_title);
 
@@ -151,19 +150,14 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
-                        postingImage.setImageResource(R.drawable.movie_no_poster);
-                        postingRatingBar.setRating(3.0f);
-                        postingTitle.setText("");
-                        postingDate.setText("이 곳을 눌러 날짜를 선택하세요.");
-                        edtReview.setText("");
+                        pageClear();
                     }
                 });
 
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(getContext(), "Cancel Click", Toast.LENGTH_SHORT).show();
+                        // 취소를 취소
                     }
                 });
 
@@ -177,24 +171,31 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 int post_date_m = post_date.get(Calendar.MONTH);
                 int post_date_d = post_date.get(Calendar.DAY_OF_MONTH);
 
-                String postDate = post_date_y + "-" + post_date_m + "-" + post_date_d;
-
+                String postDate = post_date_y + "-" + (post_date_m+1) + "-" + post_date_d;
+                // DB에 넣어준다
                 dbOpenHelper.openPosting();
                 dbOpenHelper.createPostingHelper();
                 dbOpenHelper.insertPostingColumn(movie_id, postingTitle.getText().toString().trim(),
                         posterPath, postingDate.getText().toString().trim(),
                         postDate, postingRatingBar.getRating(), edtReview.getText().toString().trim());
-
+                // DB확인. 나중에 지워줭
                 showDatabase("posting_tbl", "mv_id");
 
                 dbOpenHelper.close();
-
-                // DB로 보내야함!
-                // 저장 버튼 누르고 게시물 작성 완료하면 마이페이지로 넘어가서 새 게시물 등록된거 보여줄가??
+                pageClear();
+                Toast.makeText(getContext(),"저장되었습니다.",Toast.LENGTH_SHORT).show();
+                ((MainActivity) mActivity).setChangeFragment(FrgUser.newInstance());
                 break;
         }
     }
 
+    private void pageClear() {
+        postingImage.setImageResource(R.drawable.movie_no_poster);
+        postingRatingBar.setRating(3.0f);
+        postingTitle.setText("");
+        postingDate.setText("이 곳을 눌러 날짜를 선택하세요.");
+        edtReview.setText("");
+    }
     public void showDatabase(String tbl_name, String sort) {
         Cursor iCursor = dbOpenHelper.sortColumn(tbl_name, sort);
         Log.d("DbData", "DB Size: " + iCursor.getCount());
@@ -210,7 +211,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
             String tempContent = iCursor.getString(iCursor.getColumnIndex("content"));
 
             String Result = tempMvId + ", " + tempTitle + ", " + tempPoster +
-                    tempMovieDate + ", " + tempPostingDate + ", " + tempStar + ", " + tempContent;
+                    ", " +tempMovieDate + ", " + tempPostingDate + ", " + tempStar + ", " + tempContent;
 
             Log.d("DbData", Result);
         }

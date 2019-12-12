@@ -92,12 +92,12 @@ public class DbOpenHelper {
     public long insertPostingColumn(int mv_id, String title, String poster, String mv_date, String post_date
             , float star, String content){
         ContentValues values = new ContentValues();
+        values.put(DiaryDB.CreatePosting.STAR, star);
         values.put(DiaryDB.CreatePosting.MV_ID, mv_id);
+        values.put(DiaryDB.CreatePosting.POST_DATE, post_date);
+        values.put(DiaryDB.CreatePosting.MV_DATE, mv_date);
         values.put(DiaryDB.CreatePosting.TITLE, title);
         values.put(DiaryDB.CreatePosting.MV_POSTER, poster);
-        values.put(DiaryDB.CreatePosting.MV_DATE, mv_date);
-        values.put(DiaryDB.CreatePosting.POST_DATE, post_date);
-        values.put(DiaryDB.CreatePosting.STAR, star);
         values.put(DiaryDB.CreatePosting.CONTENT, content);
         return mDB.insert(DiaryDB.CreatePosting.POSTING_TBL, null, values);
     }

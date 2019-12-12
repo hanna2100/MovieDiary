@@ -2,7 +2,9 @@ package com.example.user.moviediary.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +31,7 @@ import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieDiaryAdapter;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.util.DbOpenHelper;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -59,6 +62,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
     // 그리드뷰 이벤트 사용 변수
     int myLastVisiblePos;
     private LinearLayout hideLayout;
+
+    private DbOpenHelper dbOpenHelper;
 
     public static FrgUser newInstance() {
         FrgUser fragment = new FrgUser();
@@ -109,17 +114,21 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         wishTabSelect = view.findViewById(R.id.wishTabSelect);
 
         hideLayout = view.findViewById(R.id.hideLayout);
+
+        dbOpenHelper = new DbOpenHelper(getContext());
+
+        // 왜 안돼!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ibDiary.callOnClick();
+
         // 처음 유저 프레그먼트에 들어왔을때는 다이어리 탭이 디폴트
         diaryTabSelect.setVisibility(View.VISIBLE);
         wishTabSelect.setVisibility(View.INVISIBLE);
+
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
 
-        movieDiaryAdapter = new MovieDiaryAdapter(getContext(), R.layout.item_user, list);
-        diaryCount.setText(String.valueOf(list.size()));
-        gridView.setAdapter(movieDiaryAdapter);
         // 그리드 뷰 이벤트 사용 변수
         myLastVisiblePos = gridView.getFirstVisiblePosition();
 
@@ -202,11 +211,39 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 break;
             case R.id.ibDiary:
                 // 그리드 뷰에 내가 리뷰 쓴 영화 나오게 하기!
+                list.clear();
+
+                Toast.makeText(getContext(),"다이어리탭 눌러짐",Toast.LENGTH_SHORT).show();
+                dbOpenHelper.openPosting();
+                dbOpenHelper.createPostingHelper();
+                Cursor cursor = dbOpenHelper.selectPostingColumns();
+
+                while (cursor.moveToNext()) {
+                    int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+                    String tempTitle = cursor.getString(cursor.getColumnIndex("title"));
+                    String tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
+                    String tempMovieDate = cursor.getString(cursor.getColumnIndex("mv_date"));
+                    String tempPostingDate = cursor.getString(cursor.getColumnIndex("post_date"));
+                    float tempStar = cursor.getFloat(cursor.getColumnIndex("star"));
+                    String tempContent = cursor.getString(cursor.getColumnIndex("content"));
+
+                    list.add(new MovieDiary(tempPoster,tempTitle,tempStar,tempMovieDate,tempContent));
+                }
+
+                dbOpenHelper.close();
+
+                movieDiaryAdapter = new MovieDiaryAdapter(getContext(), R.layout.item_user, list);
+                diaryCount.setText(String.valueOf(list.size()));
+                gridView.setAdapter(movieDiaryAdapter);
+
+                // 다이어리 탭 선택했다는 효과 주기 위함!
                 diaryTabSelect.setVisibility(View.VISIBLE);
                 wishTabSelect.setVisibility(View.INVISIBLE);
                 break;
             case R.id.ibWish:
-                // 그리드 뷰에 내가 보고싶은 영화 나오게 하기!
+                // 그리드 뷰에 내가 찜한 영화 나오게 하기!
+
+                // 찜 탭 선택했다는 효과 주기 위함!
                 diaryTabSelect.setVisibility(View.INVISIBLE);
                 wishTabSelect.setVisibility(View.VISIBLE);
                 break;
