@@ -15,6 +15,7 @@ import com.example.user.moviediary.fragment.FrgMovieHome;
 import com.example.user.moviediary.fragment.FrgMovieSearch;
 import com.example.user.moviediary.fragment.FrgPosting;
 import com.example.user.moviediary.fragment.FrgUser;
+import com.example.user.moviediary.fragment.FrgUser2;
 import com.example.user.moviediary.fragment.ThemeColors;
 
 import java.util.Random;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         setChangeFragment(FrgPosting.newInstance(0, null, null));
                         break;
                     case R.id.actionUser:
-                        setChangeFragment(FrgUser.newInstance());
+                        setChangeFragment(FrgUser2.newInstance());
                         break;
                 }
                 return true;

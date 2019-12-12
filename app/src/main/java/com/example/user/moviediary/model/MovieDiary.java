@@ -7,6 +7,10 @@ public class MovieDiary {
     private String detailDate;
     private String detailReview;
 
+    public MovieDiary(int detailImage){
+        this.detailImage = detailImage;
+    }
+
     public MovieDiary(int detailImage, String detailTitle, float detailRatingBar, String detailDate, String detailReview) {
         this.detailImage = detailImage;
         this.detailTitle = detailTitle;
