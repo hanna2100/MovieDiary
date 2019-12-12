@@ -41,18 +41,6 @@ public class FrgUserPostingList extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-
         adapter = new MovieDiaryAdapter2(R.layout.item_user, list);
         Log.d("ViewPager", "postlist size = "+list.size());
         recyclerView.setAdapter(adapter);

@@ -3,6 +3,7 @@ package com.example.user.moviediary.fragment;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.support.v7.widget.SearchView;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
@@ -71,6 +74,7 @@ public class FrgMovieSearch extends Fragment {
         view = inflater.inflate(R.layout.fragment_movie_search, container, false);
 
         setHasOptionsMenu(true);
+        ((AppCompatActivity) mActivity).getSupportActionBar().setDisplayShowTitleEnabled(false);
         ((AppCompatActivity) mActivity).getSupportActionBar().show();
 
         isPostingFrg = getArguments().getBoolean(IS_POSTING_FRG);
@@ -116,6 +120,11 @@ public class FrgMovieSearch extends Fragment {
         SearchManager searchManager = (SearchManager) mContext.getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
         searchView.setQueryHint("영화제목을 입력하세요");
+
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.WHITE);
+
 
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
 

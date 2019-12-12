@@ -1,11 +1,17 @@
 package com.example.user.moviediary;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -20,7 +26,12 @@ import com.example.user.moviediary.fragment.ThemeColors;
 
 import java.util.Random;
 
+import static com.example.user.moviediary.R.style.AppTheme;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final String NAME = "ThemeColors", KEY = "color";
+    public static int mainColor;
 
     ThemeColors themeColors;
     private boolean isThemeChanged;
@@ -34,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomMenu = findViewById(R.id.bottomMenu);
         FrameLayout mainFrame = findViewById(R.id.mainFrame);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        String stringColor = sharedPreferences.getString(KEY, "004bff");
+        mainColor = Color.parseColor("#"+stringColor);
+
+        bottomMenu.setItemIconTintList(ColorStateList.valueOf(mainColor));
+        bottomMenu.setItemTextColor(ColorStateList.valueOf(mainColor));
+
+
         //테마색상변경
         mainFrame.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -43,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 int green = new Random().nextInt(255);
                 int blue = new Random().nextInt(255);
                 themeColors.setNewThemeColor(MainActivity.this, red, green, blue);
-
-                Toast.makeText(getApplicationContext(), "df", Toast.LENGTH_LONG).show();
 
                 isThemeChanged = true;
 
@@ -75,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
         //처음 띄울 프레그먼트
         if (isThemeChanged)
             setChangeFragment(FrgUser.newInstance());

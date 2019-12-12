@@ -6,10 +6,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 //뷰페이저가 전체화면이 안되도록 하는 custom viewpager
 public class WrapContentHeightViewPager extends ViewPager {
+
+    boolean canSwipe = true;
 
     public WrapContentHeightViewPager(@NonNull Context context) {
         super(context);
@@ -21,50 +24,45 @@ public class WrapContentHeightViewPager extends ViewPager {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        // find the first child view
-        View view = getChildAt(0);
-        if (view != null) {
-            // measure the first child view with the specified measure spec
-            view.measure(widthMeasureSpec, heightMeasureSpec);
+        int mode = MeasureSpec.getMode(heightMeasureSpec);
+        // Unspecified means that the ViewPager is in a ScrollView WRAP_CONTENT.
+        // At Most means that the ViewPager is not in a ScrollView WRAP_CONTENT.
+        if (mode == MeasureSpec.UNSPECIFIED || mode == MeasureSpec.AT_MOST) {
+            // super has to be called in the beginning so the child views can be initialized.
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            int height = 0;
+            for (int i = 0; i < getChildCount(); i++) {
+                View child = getChildAt(i);
+                child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                int h = child.getMeasuredHeight();
+                if (h > height) height = h;
+            }
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
         }
-
-        setMeasuredDimension(getMeasuredWidth(), measureHeight(heightMeasureSpec, view));
-
-        Log.d("ViewPager", "getMeasuredWidth()" + getMeasuredWidth()+", measureHeight(heightMeasureSpec, view) = "+measureHeight(heightMeasureSpec, view));
+        // super has to be called again so the new specs are treated as exact measurements
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    /**
-     * Determines the height of this view
-     *
-     * @param measureSpec A measureSpec packed into an int
-     * @param view the base view with already measured height
-     *
-     * @return The height of the view, honoring constraints from measureSpec
-     */
-    private int measureHeight(int measureSpec, View view) {
-        int result = 0;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
+    public void canSwipe(boolean canSwipe) {
+        this.canSwipe = canSwipe;
+    }
 
-        Log.d("ViewPager", "specMode  = " + specMode);
-        Log.d("ViewPager", "specSize  = " + specSize);
-
-        if (specMode == MeasureSpec.EXACTLY) {
-            result = specSize;
-        } else {
-            // set the height from the base view if available
-            if (view != null) {
-                result = view.getMeasuredHeight();
-            }
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (this.canSwipe) {
+            return super.onTouchEvent(event);
         }
 
-        Log.d("ViewPager", "높이  = " + result);
-        return result;
+        return false;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (this.canSwipe) {
+            return super.onInterceptTouchEvent(event);
+        }
+
+        return false;
     }
 
 }

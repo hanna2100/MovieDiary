@@ -102,15 +102,18 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
         //추가
         viewPager = view.findViewById(R.id.viewPager);
         if (viewPager != null) {
             Log.d("ViewPager", "setupViewPager");
             setupViewPager(viewPager);
         }
-
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+
+        viewPager.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
 
         ibSetting.setOnClickListener(this);
         btnEditProfile.setOnClickListener(this);
@@ -127,12 +130,10 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
     private void setupViewPager(ViewPager viewPager) {
 
         adapter = new Adapter(getChildFragmentManager());
-        Log.d("ViewPager", "adapter=" + adapter);
         adapter.addFragment(new FrgUserPostingList(), "Posting");
         adapter.addFragment(new FrgUserLikeList(), "Like");
-        Log.d("ViewPager", "adapterCnt=" + adapter.getCount());
         viewPager.setAdapter(adapter);
-    }
+          }
 
     DrawerLayout.DrawerListener listener = new DrawerLayout.DrawerListener() {
 
@@ -217,6 +218,12 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
         public void addFragment(Fragment fragment, String title) {
             mFragments.add(fragment);
             mFragmentTitles.add(title);
+        }
+
+        @Override
+        public int getItemPosition( Object object )
+        {
+            return POSITION_NONE; // To make notifyDataSetChanged() do something
         }
 
         @Override

@@ -39,14 +39,6 @@ public class FrgUserLikeList extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext,3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-        list.add(new MovieDiary(R.drawable.movie_no_poster));
-
         adapter = new MovieDiaryAdapter2(R.layout.item_user, list);
         recyclerView.setAdapter(adapter);
         Log.d("ViewPager", "likelist size = "+list.size());
