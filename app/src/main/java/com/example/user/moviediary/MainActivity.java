@@ -21,11 +21,13 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+
     ThemeColors themeColors;
     private boolean isThemeChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         themeColors = new ThemeColors(MainActivity.this);
         setContentView(R.layout.activity_main);
