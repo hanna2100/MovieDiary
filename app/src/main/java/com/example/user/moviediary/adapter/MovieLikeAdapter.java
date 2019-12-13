@@ -3,6 +3,7 @@ package com.example.user.moviediary.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +12,18 @@ import android.widget.Toast;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
 
-public class MovieDiaryAdapter2 extends RecyclerView.Adapter<MovieDiaryAdapter2.CustomViewHolder> {
+public class MovieLikeAdapter extends RecyclerView.Adapter<MovieLikeAdapter.CustomViewHolder> {
 
     private int layout;
     private ArrayList<MovieDiary> list;
     private View view;
     private Context context;
 
-    public MovieDiaryAdapter2(int layout, ArrayList<MovieDiary> list) {
+    public MovieLikeAdapter(int layout, ArrayList<MovieDiary> list) {
         this.layout = layout;
         this.list = list;
     }
@@ -30,9 +32,8 @@ public class MovieDiaryAdapter2 extends RecyclerView.Adapter<MovieDiaryAdapter2.
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
-        MovieDiaryAdapter2.CustomViewHolder customViewHolder = new MovieDiaryAdapter2.CustomViewHolder(view);
+        MovieLikeAdapter.CustomViewHolder customViewHolder = new MovieLikeAdapter.CustomViewHolder(view);
         context = viewGroup.getContext();
-
         return customViewHolder;
     }
 
@@ -40,11 +41,15 @@ public class MovieDiaryAdapter2 extends RecyclerView.Adapter<MovieDiaryAdapter2.
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, final int i) {
 
         MovieDiary movieDiary = list.get(i);
+
+        Log.d("TAG",movieDiary.getDetailTitle());
+
+        GlideApp.with(context).load("https://image.tmdb.org/t/p/w500"+movieDiary.getDetailImage()).into(customViewHolder.imageView);
+
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(context, i+"번", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"찜",Toast.LENGTH_SHORT).show();
             }
         });
     }

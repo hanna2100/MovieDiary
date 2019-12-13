@@ -398,7 +398,6 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
                         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                         fragmentTransaction.add(R.id.flYoutube, youtubePlayer).commit();
                         tvNotFoundVideo.setVisibility(View.GONE);
-
                     } else {
                         onError();
                     }
