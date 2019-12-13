@@ -43,7 +43,6 @@ public class ThemeColors {
         editor.putString(KEY, stringColor);
         editor.apply();
 
-        Log.wtf("setNewThemeColor", "AAA");
 
        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) activity.recreate();
 

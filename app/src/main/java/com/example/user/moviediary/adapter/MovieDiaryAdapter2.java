@@ -40,7 +40,6 @@ public class MovieDiaryAdapter2 extends RecyclerView.Adapter<MovieDiaryAdapter2.
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, final int i) {
 
         MovieDiary movieDiary = list.get(i);
-        customViewHolder.imageView.setImageResource(movieDiary.getDetailImage());
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

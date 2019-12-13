@@ -3,6 +3,9 @@ package com.example.user.moviediary.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -54,6 +59,7 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
     private View view;
 
     private LinearLayout hideLayout;
+    private FrameLayout flTop;
 
     private WrapContentHeightViewPager viewPager;
     private Adapter adapter;
@@ -99,21 +105,15 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
         userImage = view.findViewById(R.id.userImage);
 
         hideLayout = view.findViewById(R.id.hideLayout);
+        flTop = view.findViewById(R.id.flTop);
+        viewPager = view.findViewById(R.id.viewPager);
+
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        //추가
-        viewPager = view.findViewById(R.id.viewPager);
-        if (viewPager != null) {
-            Log.d("ViewPager", "setupViewPager");
-            setupViewPager(viewPager);
-        }
-        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
-
-        viewPager.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
+        //탭레이아웃 세팅
+        setupTabLayout();
 
         ibSetting.setOnClickListener(this);
         btnEditProfile.setOnClickListener(this);
@@ -127,13 +127,30 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
         return view;
     }
 
+    private void setupTabLayout() {
+        if (viewPager != null) {
+            Log.d("ViewPager", "setupViewPager");
+            setupViewPager(viewPager);
+        }
+        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.user_ic_posting);
+        tabLayout.getTabAt(1).setIcon(R.drawable.user_ic_like);
+
+        viewPager.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            flTop.setBackgroundColor(MainActivity.mainColor);
+        }
+    }
+
     private void setupViewPager(ViewPager viewPager) {
 
         adapter = new Adapter(getChildFragmentManager());
-        adapter.addFragment(new FrgUserPostingList(), "Posting");
-        adapter.addFragment(new FrgUserLikeList(), "Like");
+        adapter.addFragment(new FrgUserPostingList(),null);
+        adapter.addFragment(new FrgUserLikeList(),null);
         viewPager.setAdapter(adapter);
-          }
+
+    }
 
     DrawerLayout.DrawerListener listener = new DrawerLayout.DrawerListener() {
 
@@ -166,11 +183,11 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
             case R.id.ibSetting:
                 mainLayout.openDrawer(drawerLayout);
                 break;
+
             case R.id.btnEditProfile:
                 // 프로필 수정 창 뜨게 하기
                 ((MainActivity) mContext).setChangeFragment(FrgUserProfileEdit.newInstance());
                 break;
-
 
             //Drawer menu
             case R.id.btnTheme:
@@ -178,7 +195,6 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
                 int red = new Random().nextInt(255);
                 int green = new Random().nextInt(255);
                 int blue = new Random().nextInt(255);
-                //ThemeColors.setNewThemeColor((MainActivity) mContext, red, green, blue);
                 ThemeColors.setNewThemeColor((MainActivity) mContext, red, green, blue);
                 break;
 
@@ -194,9 +210,7 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
                 email.putExtra(Intent.EXTRA_SUBJECT, "문의 사항");
                 email.putExtra(Intent.EXTRA_TEXT, "개발자님께 문의 및 의견 사항이 있어 메일을 보냅니다.\n");
                 startActivity(email);
-
                 break;
-
 
         }
     }
@@ -221,8 +235,7 @@ public class FrgUser2 extends Fragment implements View.OnClickListener, View.OnT
         }
 
         @Override
-        public int getItemPosition( Object object )
-        {
+        public int getItemPosition(Object object) {
             return POSITION_NONE; // To make notifyDataSetChanged() do something
         }
 

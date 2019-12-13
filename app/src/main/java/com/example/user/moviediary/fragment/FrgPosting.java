@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +54,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
     private View view;
 
     private DbOpenHelper dbOpenHelper;
+    CollapsingToolbarLayout collapseActionView;
 
     public static FrgPosting newInstance(int movie_id, String title, String poster_path) {
         FrgPosting fragment = new FrgPosting();
@@ -86,6 +88,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
         postingTitle = view.findViewById(R.id.postingTitle);
         postingDate = view.findViewById(R.id.postingDate);
         edtReview = view.findViewById(R.id.edtReview);
+        collapseActionView = view.findViewById(R.id.collapseActionView);
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -114,6 +117,8 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
             GlideApp.with(view).load(posterPath)
                     .fitCenter()
                     .into(postingImage);
+        } else{
+            postingImage.setColorFilter(MainActivity.mainColor);
         }
 
         //제목설정
@@ -185,6 +190,10 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 pageClear();
                 Toast.makeText(getContext(),"저장되었습니다.",Toast.LENGTH_SHORT).show();
                 ((MainActivity) mActivity).setChangeFragment(FrgUser.newInstance());
+                break;
+
+            case R.id.edtReview:
+
                 break;
         }
     }

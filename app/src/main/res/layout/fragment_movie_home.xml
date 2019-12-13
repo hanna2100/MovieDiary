@@ -15,69 +15,85 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="인기영화"
-                android:textSize="20sp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"/>
-
-            <FrameLayout
-                android:id="@+id/flYoutube"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="33dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/billabong"
+                    android:text="  Popular Movie"
+                    android:textSize="33sp"/>
+
+                <LinearLayout
+                    android:id="@+id/bar1"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/flYoutube"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:src="@drawable/movie_no_poster"
                     android:id="@+id/ivPopularPoster"
                     android:layout_width="45dp"
                     android:layout_height="45dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="10dp"/>
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/movie_no_poster" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginRight="20dp">
+                    android:layout_marginRight="20dp"
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
                         <TextView
                             android:id="@+id/tvPopularTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="영화제목"
                             android:layout_weight="1"
-                            android:maxLines="1"
                             android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="영화제목"
                             android:textSize="15dp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
+
                         <Button
                             android:id="@+id/btnPopularMore"
                             android:layout_width="70dp"
                             android:layout_height="29dp"
-                            android:text="상세보기"
-                            android:textSize="9dp"
                             android:layout_marginTop="5dp"
-                            android:background="@drawable/background_button_border"/>
+                            android:background="@drawable/background_button_border"
+                            android:text="상세보기"
+                            android:textSize="9dp" />
 
                     </LinearLayout>
 
@@ -85,12 +101,12 @@
                         android:id="@+id/tvPopularOverview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="줄거리"
-                        android:textSize="13dp"
                         android:layout_marginTop="3dp"
-                        android:maxLines="2"
                         android:layout_marginBottom="20dp"
-                        android:ellipsize="end"/>
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:text="줄거리"
+                        android:textSize="13dp" />
 
                 </LinearLayout>
 
@@ -99,31 +115,44 @@
         </LinearLayout>
 
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:layout_marginTop="15dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="무비차트"
-                android:textSize="20sp" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="자료출처: CGV"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tvMC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="33dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/billabong"
+                    android:text="  Movie Chart"
+                    android:textSize="33sp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:text="자료출처: CGV"
+                    android:textSize="12sp"
+                    android:layout_marginRight="10dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bar2"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/colorPrimaryDark"
+                android:orientation="vertical" />
         </LinearLayout>
+
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -133,19 +162,25 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvLM"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="33dp"
                 android:layout_weight="1"
-                android:text="최신영화"
-                android:textSize="20sp" />
+                android:fontFamily="@font/billabong"
+                android:text="  Latest Movie"
+                android:textSize="33sp" />
+
+            <LinearLayout
+                android:id="@+id/bar3"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/colorPrimaryDark"
+                android:orientation="vertical" />
 
         </LinearLayout>
 

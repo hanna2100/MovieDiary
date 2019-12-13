@@ -29,25 +29,31 @@
                 android:orientation="vertical">
 
                 <FrameLayout
+                    android:id="@+id/flTop"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
+                    android:background="@color/colorPrimaryDark"
                     android:padding="10dp">
 
                     <TextView
                         android:id="@+id/userID"
+                        android:textColor="#ffffff"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:fontFamily="@font/billabong"
                         android:gravity="center"
-                        android:text="pyojihoon202@naver.com"
-                        android:textSize="17sp"
+                        android:text=" Movie Diary"
+                        android:textSize="25sp"
                         android:textStyle="bold" />
 
                     <ImageButton
                         android:id="@+id/ibSetting"
-                        android:layout_width="27dp"
-                        android:layout_height="27dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:layout_gravity="right"
+                        android:scaleType="fitCenter"
+                        android:layout_marginTop="1dp"
+                        android:tint="#ffffff"
                         android:background="@android:color/transparent"
                         android:src="@drawable/user_setting" />
 
@@ -151,18 +157,7 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="후기" />
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="찜" />
+            android:layout_height="wrap_content">
 
         </android.support.design.widget.TabLayout>
 

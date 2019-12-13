@@ -156,8 +156,7 @@
                             android:layout_marginBottom="5dp"
                             android:layout_weight="1"
                             android:background="@android:color/transparent"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/user_film" />
+                            android:scaleType="fitCenter"/>
 
                         <LinearLayout
                             android:id="@+id/diaryTabSelect"
@@ -183,8 +182,7 @@
                             android:layout_marginBottom="5dp"
                             android:layout_weight="1"
                             android:background="@android:color/transparent"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/user_heart" />
+                            android:scaleType="fitCenter" />
 
                         <LinearLayout
                             android:id="@+id/wishTabSelect"

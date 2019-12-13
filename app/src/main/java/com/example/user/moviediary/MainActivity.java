@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     public static int mainColor;
 
     ThemeColors themeColors;
-    private boolean isThemeChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,27 +46,21 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences(NAME, Context.MODE_PRIVATE);
         String stringColor = sharedPreferences.getString(KEY, "004bff");
-        mainColor = Color.parseColor("#"+stringColor);
+        mainColor = Color.parseColor("#" + stringColor);
 
-        bottomMenu.setItemIconTintList(ColorStateList.valueOf(mainColor));
-        bottomMenu.setItemTextColor(ColorStateList.valueOf(mainColor));
+        ColorStateList colorList = new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_checked}, // checked
+                        new int[]{-android.R.attr.state_checked} // unchecked
+                },
+                new int[]{
+                        mainColor,
+                        Color.GRAY
+                }
+        );
 
-
-        //테마색상변경
-        mainFrame.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-
-                int red = new Random().nextInt(255);
-                int green = new Random().nextInt(255);
-                int blue = new Random().nextInt(255);
-                themeColors.setNewThemeColor(MainActivity.this, red, green, blue);
-
-                isThemeChanged = true;
-
-                return true;
-            }
-        });
+        bottomMenu.setItemIconTintList(colorList);
+        bottomMenu.setItemTextColor(colorList);
 
 
         //메뉴를 변경했을 때 해당된 프레그먼트를 세팅한다
@@ -93,11 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //처음 띄울 프레그먼트
-        if (isThemeChanged)
-            setChangeFragment(FrgUser.newInstance());
-        else
-            setChangeFragment(FrgMovieHome.newInstance());
+
     }
 
     public void setChangeFragment(Fragment fragment) {
