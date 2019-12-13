@@ -85,8 +85,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                              @Nullable Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_user, container, false);
-
-        new ThemeColors(mContext); /** 테마 클래스 */
+        new ThemeColors(mContext);
 
         mainLayout = view.findViewById(R.id.mainLayout);
         drawerLayout = view.findViewById(R.id.drawerLayout);
@@ -94,8 +93,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         ibDiary = view.findViewById(R.id.ibDiary);
         ibWish = view.findViewById(R.id.ibWish);
 
-        btnTheme = view.findViewById(R.id.btnTheme); // 테마변경 버튼
-        btnMail = view.findViewById(R.id.btnMail); // 관리자에게 메일로 의견 및 문의사항 보내기 버튼
+        btnTheme = view.findViewById(R.id.btnTheme);
+        btnMail = view.findViewById(R.id.btnMail);
 
         userID = view.findViewById(R.id.userID);
         diaryCount = view.findViewById(R.id.diaryCount);
@@ -131,13 +130,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
             }
 
             @Override
-            public void onScroll(AbsListView view,
-                                 int firstVisibleItem,
-                                 int visibleItemCount,
-                                 int totalItemCount) {
-
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int currentFirstVisPos = view.getFirstVisiblePosition();
-
                 if (currentFirstVisPos > myLastVisiblePos) {
                     //scroll down
                     Toast.makeText(mContext, "스크롤 다운", Toast.LENGTH_SHORT).show();
@@ -218,7 +212,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 break;
 
             case R.id.btnTheme:
-                // 색상 변경
+
                 int red= new Random().nextInt(255);
                 int green= new Random().nextInt(255);
                 int blue= new Random().nextInt(255);
@@ -228,7 +222,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
             case R.id.btnMail:
 
-                mainLayout.closeDrawer(drawerLayout); // 버튼 클릭했을 때 닫아주기
+                mainLayout.closeDrawer(drawerLayout);
 
                 Intent email = new Intent(Intent.ACTION_SEND);
                 email.setType("plain/text");
@@ -247,8 +241,6 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-
         return true;
-
     }
 }

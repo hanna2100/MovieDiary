@@ -28,9 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ea6b8a" />
+                            <entry key="color" value="cccccc" />
                             <entry key="height" value="50" />
-                            <entry key="outputName" value="ic_like" />
+                            <entry key="outputName" value="user_heart_gray" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\user" />
                             <entry key="width" value="50" />

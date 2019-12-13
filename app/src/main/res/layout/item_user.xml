@@ -7,8 +7,7 @@
 
     <ImageView
         android:id="@+id/movieImage"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
-        android:scaleType="fitXY"/>
+        android:layout_width="200dp"
+        android:layout_height="200dp" />
 
 </LinearLayout>

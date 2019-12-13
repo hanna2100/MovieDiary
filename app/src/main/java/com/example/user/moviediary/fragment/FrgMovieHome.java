@@ -103,6 +103,20 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
         btnPopularMore = view.findViewById(R.id.btnPopularMore);
         rcvLatestMovie = view.findViewById(R.id.rcvLatestMovie);
 
+        TextView tvPM = view.findViewById(R.id.tvPM);
+        TextView tvLM = view.findViewById(R.id.tvLM);
+        TextView tvMC = view.findViewById(R.id.tvMC);
+        LinearLayout bar1 = view.findViewById(R.id.bar1);
+        LinearLayout bar2 = view.findViewById(R.id.bar2);
+        LinearLayout bar3 = view.findViewById(R.id.bar3);
+
+        tvPM.setTextColor(MainActivity.mainColor);
+        tvLM.setTextColor(MainActivity.mainColor);
+        tvMC.setTextColor(MainActivity.mainColor);
+        bar1.setBackgroundColor(MainActivity.mainColor);
+        bar2.setBackgroundColor(MainActivity.mainColor);
+        bar3.setBackgroundColor(MainActivity.mainColor);
+
         moviesRepository = MoviesRepository.getInstance();
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();

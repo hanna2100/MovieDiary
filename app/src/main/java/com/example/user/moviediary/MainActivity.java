@@ -33,6 +33,25 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomMenu = findViewById(R.id.bottomMenu);
         FrameLayout mainFrame = findViewById(R.id.mainFrame);
 
+        //테마색상변경
+        mainFrame.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                int red = new Random().nextInt(255);
+                int green = new Random().nextInt(255);
+                int blue = new Random().nextInt(255);
+                themeColors.setNewThemeColor(MainActivity.this, red, green, blue);
+
+                Toast.makeText(getApplicationContext(), "df", Toast.LENGTH_LONG).show();
+
+                isThemeChanged = true;
+
+                return true;
+            }
+        });
+
+
         //메뉴를 변경했을 때 해당된 프레그먼트를 세팅한다
         bottomMenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -65,12 +84,7 @@ public class MainActivity extends AppCompatActivity {
     public void setChangeFragment(Fragment fragment) {
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(
-                R.anim.enter_from_right,
-                R.anim.exit_to_right,
-                R.anim.enter_from_right,
-                R.anim.exit_to_right);
-
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_right);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.mainFrame, fragment);
         fragmentTransaction.commit();

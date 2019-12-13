@@ -1,12 +1,16 @@
 package com.example.user.moviediary.fragment;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -18,15 +22,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.util.DbOpenHelper;
+import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -39,14 +49,25 @@ public class FrgMovieDiaryDetails extends Fragment {
     private TextView detailDate;
     private TextView detailContent;
 
-    private Context mContext;
-    private View view;
-
     private ArrayList<MovieDiary> list;
 
-    public static FrgMovieDiaryDetails newInstance() {
+    private Context mContext;
+    private View view;
+    private DbOpenHelper dbOpenHelper;
+
+    private int mv_id;
+    private String imageSource, title, date, content;
+    private float star;
+
+    public static FrgMovieDiaryDetails newInstance(int mv_id, String imageSource, String title, float star, String date, String content) {
         FrgMovieDiaryDetails fragment = new FrgMovieDiaryDetails();
         Bundle args = new Bundle();
+        args.putInt("mv_id", mv_id);
+        args.putString("imageSource", imageSource);
+        args.putString("title", title);
+        args.putFloat("star", star);
+        args.putString("date", date);
+        args.putString("content", content);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,6 +90,22 @@ public class FrgMovieDiaryDetails extends Fragment {
         detailDate = view.findViewById(R.id.detailDate);
         detailContent = view.findViewById(R.id.detailContent);
 
+        dbOpenHelper = new DbOpenHelper(mContext);
+
+        mv_id = getArguments().getInt("mv_id");
+        imageSource = getArguments().getString("imageSource");
+        title = getArguments().getString("title");
+        star = getArguments().getFloat("star");
+        date = getArguments().getString("date");
+        content = getArguments().getString("content");
+
+        GlideApp.with(mContext).load(imageSource).fitCenter().into(detailPosterImage);
+        detailRatingBar.setRating(star);
+        detailDate.setText(date);
+        detailContent.setText(title + "  " + content);
+
+        setTags(detailContent, detailContent.getText().toString());
+
         ibOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,13 +118,41 @@ public class FrgMovieDiaryDetails extends Fragment {
                 btnDiaryEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // 수정버튼 이벤트
+                        // 수정 버튼 이벤트
+                        bottomSheetDialog.dismiss();
+                        // 다이어리 수정 프래그먼트 콜해줌
+                        ((MainActivity) mContext).setChangeFragment(FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
+
                     }
                 });
                 btnDiaryDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // 수정버튼 이벤트
+                        // 식제 버튼 이벤트
+                        dbOpenHelper.openPosting();
+                        // 취소 재확인 다이얼로그 띄움
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("다이어리 삭제").setMessage("다이어리를 삭제하시겠습니까?");
+                        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                dbOpenHelper.deletePostingColumns(mv_id);
+                                dbOpenHelper.close();
+                                Toast.makeText(getContext(), "다이어리가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                bottomSheetDialog.dismiss();
+                                ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                            }
+                        });
+
+                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Toast.makeText(getContext(), "취소되었습니다..", Toast.LENGTH_SHORT).show();
+                                bottomSheetDialog.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
                     }
                 });
                 bottomSheetDialog.show();
@@ -139,4 +204,6 @@ public class FrgMovieDiaryDetails extends Fragment {
         pTextView.setMovementMethod(LinkMovementMethod.getInstance());
         pTextView.setText(string);
     }
+
+
 }
