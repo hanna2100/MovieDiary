@@ -210,7 +210,6 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 email.putExtra(Intent.EXTRA_SUBJECT, "문의 사항");
                 email.putExtra(Intent.EXTRA_TEXT, "개발자님께 문의 및 의견 사항이 있어 메일을 보냅니다.\n");
                 startActivity(email);
-
                 break;
 
         }

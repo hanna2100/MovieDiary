@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
 import com.example.user.moviediary.util.GlideApp;
@@ -65,6 +66,10 @@ public class MovieLikeAdapter extends RecyclerView.Adapter<MovieLikeAdapter.Cust
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.movieImage);
+            ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
+            layoutParams.width = MainActivity.deviceWidth/3;
+            layoutParams.height = (int)((MainActivity.deviceWidth/3)*1.4);
+            imageView.setLayoutParams(layoutParams);
         }
     }
 }

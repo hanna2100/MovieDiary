@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String NAME = "ThemeColors", KEY = "color";
     public static int mainColor;
-
+    public static int deviceWidth;
 
     ThemeColors themeColors;
     public static boolean isChangedTheme;
@@ -32,15 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        //테마설정
         themeColors = new ThemeColors(MainActivity.this);
         setContentView(R.layout.activity_main);
-
 
         BottomNavigationView bottomMenu = findViewById(R.id.bottomMenu);
         FrameLayout mainFrame = findViewById(R.id.mainFrame);
 
+        //테마색상가져오기
         SharedPreferences sharedPreferences = getSharedPreferences(NAME, Context.MODE_PRIVATE);
         String stringColor = sharedPreferences.getString(KEY, "004bff");
         mainColor = Color.parseColor("#" + stringColor);
@@ -55,13 +57,19 @@ public class MainActivity extends AppCompatActivity {
                         Color.GRAY
                 }
         );
-
+        //바텀메뉴 테마색상설정
         bottomMenu.setItemIconTintList(colorList);
         bottomMenu.setItemTextColor(colorList);
 
         //첫 화면을 시작화면으로 설정
         if (!isChangedTheme)
             setChangeFragment(FrgMovieHome.newInstance());
+
+        //디바이스 크기구하기
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        deviceWidth = size.x;
 
         //메뉴를 변경했을 때 해당된 프레그먼트를 세팅한다
         bottomMenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
