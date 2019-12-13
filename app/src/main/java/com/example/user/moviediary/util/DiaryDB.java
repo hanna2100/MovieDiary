@@ -30,7 +30,7 @@ public final class DiaryDB {
         public static final String CREATE_POSTING = "create table if not exists "
                 +POSTING_TBL+" ("
                 +MV_ID+" integer primary key, "
-                +MV_POSTER+" text not null, "
+                +MV_POSTER+" text , "
                 +TITLE+" text not null , "
                 +MV_DATE+" text not null , "
                 +POST_DATE+" text not null , "
@@ -48,6 +48,6 @@ public final class DiaryDB {
                 +LIKE_TBL+"("
                 +MV_ID+" integer primary key, "
                 +TITLE+" text not null, "
-                +MV_POSTER+" text not null);";
+                +MV_POSTER+" text );";
     }
 }
