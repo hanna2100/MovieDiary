@@ -119,19 +119,7 @@ public class FrgMovieDiaryDetails extends Fragment {
         detailRatingBar.setRating(star);
         detailDate.setText(date);
 
-        int titleLength = title.length();
-
-        String d_title = title;
-        String d_content = content;
-        String str = d_title + "  " + d_content;
-
-        str = str.replace(" ", "\u00A0");
-
-        SpannableStringBuilder customColor = new SpannableStringBuilder(str);
-        customColor.setSpan(new ForegroundColorSpan(Color.parseColor("#22243d")), 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        customColor.setSpan(new StyleSpan(Typeface.BOLD), 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        detailContent.setText(customColor);
+        detailContent.setText(title+ "  "+content);
 
         setTags(detailContent, detailContent.getText().toString());
 
@@ -213,9 +201,7 @@ public class FrgMovieDiaryDetails extends Fragment {
 
                         @Override
                         public void onClick(View widget) {
-                            // 해시태그한거 클릭 이벤트 여기다가~~!
-                            // 태그 기반으로 검색?할 수 있게??? 만들어야하나?
-                            Log.d("Hash", String.format("Clicked %s!", tag));
+                            ((MainActivity) getContext()).setChangeFragment(FrgHashtag.newInstance(tag));
                         }
 
                         @Override

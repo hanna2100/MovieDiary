@@ -120,6 +120,12 @@ public class DbOpenHelper {
 
     }
 
+    public Cursor searchPostingColumn(String tag) {
+        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE content LIKE '%"+tag+"%';", null);
+        return  c;
+    }
+
+
     public void deletePostingColumns(int mv_id) {
         mDB.delete(DiaryDB.CreatePosting.POSTING_TBL, "mv_id=" + mv_id, null);
 

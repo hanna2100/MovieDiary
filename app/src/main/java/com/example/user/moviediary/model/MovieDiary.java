@@ -10,6 +10,11 @@ public class MovieDiary {
     private String detailDate;
     private String detailReview;
 
+
+    public MovieDiary(String detailReview) {
+        this.detailReview = detailReview;
+    }
+
     public MovieDiary(int mv_id, String detailImage, String detailTitle) {
         this.mv_id = mv_id;
         this.detailImage = detailImage;

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -178,7 +177,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), "영화 정보를 추가해주세요.", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if (postingDate.getText().toString().equals("") || edtReview.getText().toString().equals("")) {
+                if (postingDate.getText().toString().equals("") || postingDate.getText().toString().equals("날짜를 선택하세요.") || edtReview.getText().toString().equals("")) {
                     Toast.makeText(getContext(), "입력되지않은 항목이 있습니다. 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -194,7 +193,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 dbOpenHelper.createPostingHelper();
                 dbOpenHelper.insertPostingColumn(movie_id, postingTitle.getText().toString().trim(),
                         posterPath, postingDate.getText().toString().trim(),
-                        postDate, postingRatingBar.getRating(), edtReview.getText().toString().trim());
+                        postDate, postingRatingBar.getRating(), edtReview.getText().toString().trim()+" ");
                 // DB확인. 나중에 지워줭
                 showDatabase("posting_tbl", "mv_id");
 

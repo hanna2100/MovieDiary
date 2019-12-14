@@ -1,34 +1,31 @@
 package com.example.user.moviediary.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.fragment.FrgMovieDetails;
 import com.example.user.moviediary.fragment.FrgMovieDiaryDetails;
 import com.example.user.moviediary.model.MovieDiary;
-import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
 
-public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.CustomViewHolder> {
+public class MovieHashtagAdapter extends RecyclerView.Adapter<MovieHashtagAdapter.CustomViewHolder> {
 
     private int layout;
     private ArrayList<MovieDiary> list;
     private View view;
     private Context context;
-    private DbOpenHelper dbOpenHelper;
 
-    public MovieDiaryAdapter(int layout, ArrayList<MovieDiary> list) {
+    public MovieHashtagAdapter(int layout, ArrayList<MovieDiary> list) {
         this.layout = layout;
         this.list = list;
     }
@@ -37,25 +34,23 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
-        MovieDiaryAdapter.CustomViewHolder customViewHolder = new MovieDiaryAdapter.CustomViewHolder(view);
+        MovieHashtagAdapter.CustomViewHolder customViewHolder = new MovieHashtagAdapter.CustomViewHolder(view);
         context = viewGroup.getContext();
-
-        dbOpenHelper = new DbOpenHelper(context);
-
         return customViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, final int i) {
 
-        MovieDiary movieDiary = list.get(i);
+        final MovieDiary movieDiary = list.get(i);
+
+        Log.d("TAG", movieDiary.getDetailTitle());
 
         GlideApp.with(context).load(movieDiary.getDetailImage()).into(customViewHolder.imageView);
 
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 다이어리 상세정보 프래그먼트 띄움
                 ((MainActivity) context)
                         .setChangeFragment(FrgMovieDiaryDetails.newInstance(list.get(i).getMv_id(),list.get(i).getDetailImage(),
                                 list.get(i).getDetailTitle(),list.get(i).getDetailRatingBar(),
@@ -65,7 +60,7 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
     }
 
     @Override
-    public int getItemCount()  {
+    public int getItemCount() {
         return list != null ? list.size() : 0;
     }
 
@@ -75,12 +70,10 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.movieImage);
-
             ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
-            layoutParams.width = MainActivity.deviceWidth/3;
-            layoutParams.height = (int)((MainActivity.deviceWidth/3)*1.4);
+            layoutParams.width = MainActivity.deviceWidth / 3;
+            layoutParams.height = (int) ((MainActivity.deviceWidth / 3) * 1.4);
             imageView.setLayoutParams(layoutParams);
-
         }
     }
 }
