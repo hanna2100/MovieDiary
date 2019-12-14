@@ -6,15 +6,17 @@ public final class DiaryDB {
 
     public static final class CreateUser implements BaseColumns{
 
-        public static final String NICKNAME = "nickname";
-        public static final String PHOTO = "photo";
-        public static final String SLF_INT = "slf_int";
+        public static final String NAME = "name";
+        public static final String PROFILE_IMG = "profile_img";
+        public static final String DIARY_DESC = "diary_desc";
+        public static final String KAKAO_LOGIN = "kakao_login";
         public static final String USER_TBL = "user_tbl";
         public static final String CREATE_USR = "create table if not exists "
                 +USER_TBL+"("
-                +NICKNAME+" text primary key, "
-                +PHOTO+" text not null , "
-                +SLF_INT+" text );";
+                +NAME+" text primary key, "
+                +PROFILE_IMG+" text , "
+                +DIARY_DESC+" text not null ,"
+                +KAKAO_LOGIN+" integer not null);";
     }
 
     public static final class CreatePosting implements BaseColumns{

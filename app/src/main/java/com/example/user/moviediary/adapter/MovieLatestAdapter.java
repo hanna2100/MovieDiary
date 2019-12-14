@@ -106,9 +106,8 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
         if (movie.getPoster_path()!=null) {
             String url = "https://image.tmdb.org/t/p/w1280" + movie.getBackdrop_path();
 
-            Glide.with(context).load(url)
-                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 3))
-                            .override(Target.SIZE_ORIGINAL, 1000).centerCrop())
+            GlideApp.with(context).load(url)
+                    .centerCrop()
                     .into(viewHolder.ivBackdrop);
         }
 
@@ -208,6 +207,11 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
             this.btnLatestMore = itemView.findViewById(R.id.btnLatestMore);
             this.ibUnlike = itemView.findViewById(R.id.ibUnlike);
             this.ibLike = itemView.findViewById(R.id.ibLike);
+
+            ViewGroup.LayoutParams layoutParams = ivBackdrop.getLayoutParams();
+            layoutParams.width = MainActivity.deviceWidth;
+            layoutParams.height = MainActivity.deviceWidth;
+            ivBackdrop.setLayoutParams(layoutParams);
 
         }
 

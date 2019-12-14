@@ -96,7 +96,7 @@
                         android:id="@+id/postingDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="15dp"
                         android:text="날짜를 선택하세요."
                         android:textSize="20sp" />
 

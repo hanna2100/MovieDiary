@@ -21,7 +21,7 @@ public class ThemeColors {
     public ThemeColors(Context context) {
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        String stringColor = sharedPreferences.getString(KEY, "004bff");
+        String stringColor = sharedPreferences.getString(KEY, "252525");
         color = Color.parseColor("#" + stringColor);
 
         if (isLightActionBar()) context.setTheme(R.style.AppTheme);

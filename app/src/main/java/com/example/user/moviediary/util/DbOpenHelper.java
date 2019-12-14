@@ -17,22 +17,36 @@ public class DbOpenHelper {
     private LikeTBLHelper likeHelper;
     private Context mContext;
 
-    public DbOpenHelper(Context context){
+    public DbOpenHelper(Context context) {
         this.mContext = context;
     }
 
-    public void createUserHelper(){
+    public void close() {
+        mDB.close();
+    }
+
+    public void createUserHelper() {
         userHelper.onCreate(mDB);
     }
 
-    public void createPostingHelper(){
+    public void createPostingHelper() {
         postingHelper.onCreate(mDB);
     }
 
-    public void createLikeHelper(){ likeHelper.onCreate(mDB); }
+    public void createLikeHelper() {
+        likeHelper.onCreate(mDB);
+    }
 
-    public void close(){
-        mDB.close();
+    public void upgradeUserHelper() {
+        userHelper.onUpgrade(mDB, VERSION, VERSION);
+    }
+
+    public void upgradePostingHelper() {
+        postingHelper.onUpgrade(mDB, VERSION, VERSION);
+    }
+
+    public void upgradeLikeHelper() {
+        likeHelper.onUpgrade(mDB, VERSION, VERSION);
     }
 
     public DbOpenHelper openUser() throws SQLException {
@@ -53,36 +67,38 @@ public class DbOpenHelper {
         return this;
     }
 
-    public Cursor sortColumn(String tbl_name, String sort){
-        Cursor c = mDB.rawQuery( "SELECT * FROM "+tbl_name+" ORDER BY " + sort + ";", null);
+    public Cursor sortColumn(String tbl_name, String sort) {
+        Cursor c = mDB.rawQuery("SELECT * FROM " + tbl_name + " ORDER BY " + sort + ";", null);
         return c;
     }
 
     //유저 테이블 CRUD 모음
 
-    public long insertUserColumn(String nickname, String photo, String slf_int){
+    public long insertUserColumn(String name, String profile_img, String diary_desc, int kakao_login) {
         ContentValues values = new ContentValues();
-        values.put(DiaryDB.CreateUser.NICKNAME, nickname);
-        values.put(DiaryDB.CreateUser.PHOTO, photo);
-        values.put(DiaryDB.CreateUser.SLF_INT, slf_int);
+        values.put(DiaryDB.CreateUser.NAME, name);
+        values.put(DiaryDB.CreateUser.PROFILE_IMG, profile_img);
+        values.put(DiaryDB.CreateUser.DIARY_DESC, diary_desc);
+        values.put(DiaryDB.CreateUser.KAKAO_LOGIN, kakao_login);
         return mDB.insert(DiaryDB.CreateUser.USER_TBL, null, values);
     }
 
-    public Cursor selectUserColumns(){
+    public Cursor selectUserColumns() {
         return mDB.query(DiaryDB.CreateUser.USER_TBL, null, null, null, null, null, null);
     }
 
-    public boolean updateUserColumn(String nickname, String photo, String slf_int){
+    public boolean updateUserColumn(String name, String profile_img, String diary_desc, int kakao_login) {
         ContentValues values = new ContentValues();
-        values.put(DiaryDB.CreateUser.NICKNAME, nickname);
-        values.put(DiaryDB.CreateUser.PHOTO, photo);
-        values.put(DiaryDB.CreateUser.SLF_INT, slf_int);
-        return mDB.update(DiaryDB.CreateUser.USER_TBL, values, "NICKNAME=" + nickname, null) > 0;
+        values.put(DiaryDB.CreateUser.NAME, name);
+        values.put(DiaryDB.CreateUser.PROFILE_IMG, profile_img);
+        values.put(DiaryDB.CreateUser.DIARY_DESC, diary_desc);
+        values.put(DiaryDB.CreateUser.KAKAO_LOGIN, kakao_login);
+        return mDB.update(DiaryDB.CreateUser.USER_TBL, values, "NAME=" + name, null) > 0;
 
     }
 
-    public void deleteUserColumns(String nickname) {
-        mDB.delete(DiaryDB.CreateUser.USER_TBL, "NICKNAME="+nickname, null);
+    public void deleteUserColumns(String name) {
+        mDB.delete(DiaryDB.CreateUser.USER_TBL, "NAME=" + name, null);
 
     }
 
@@ -90,7 +106,7 @@ public class DbOpenHelper {
     //포스팅 테이블 CRUD 모음
 
     public long insertPostingColumn(int mv_id, String title, String poster, String mv_date, String post_date
-            , float star, String content){
+            , float star, String content) {
         ContentValues values = new ContentValues();
         values.put(DiaryDB.CreatePosting.STAR, star);
         values.put(DiaryDB.CreatePosting.MV_ID, mv_id);
@@ -102,12 +118,12 @@ public class DbOpenHelper {
         return mDB.insert(DiaryDB.CreatePosting.POSTING_TBL, null, values);
     }
 
-    public Cursor selectPostingColumns(){
+    public Cursor selectPostingColumns() {
         return mDB.query(DiaryDB.CreatePosting.POSTING_TBL, null, null, null, null, null, null);
     }
 
     public boolean updatePostingColumn(int mv_id, String title, String poster, String mv_date, String post_date
-            , float star, String content){
+            , float star, String content) {
         ContentValues values = new ContentValues();
         values.put(DiaryDB.CreatePosting.MV_ID, mv_id);
         values.put(DiaryDB.CreatePosting.TITLE, title);
@@ -120,33 +136,32 @@ public class DbOpenHelper {
 
     }
 
-    public Cursor searchPostingColumn(String tag) {
-        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE content LIKE '%"+tag+"%';", null);
-        return  c;
-    }
-
-
     public void deletePostingColumns(int mv_id) {
         mDB.delete(DiaryDB.CreatePosting.POSTING_TBL, "mv_id=" + mv_id, null);
 
     }
 
+    public Cursor searchPostingColumn(String tag) {
+        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE content LIKE '%" + tag + "%';", null);
+        return c;
+    }
+
     ///////////////////////////////////////////////////
     //라이크 테이블 CRUD 모음
 
-    public long insertLikeColumn(int mv_id, String title, String mv_poster){
+    public long insertLikeColumn(int mv_id, String title, String mv_poster) {
         ContentValues values = new ContentValues();
         values.put(DiaryDB.CreateLike.MV_ID, mv_id);
         values.put(DiaryDB.CreateLike.TITLE, title);
         values.put(DiaryDB.CreateLike.MV_POSTER, mv_poster);
-        return mDB.insert(DiaryDB.CreateLike.LIKE_TBL,  null, values);
+        return mDB.insert(DiaryDB.CreateLike.LIKE_TBL, null, values);
     }
 
-    public Cursor selectLikeColumns(){
+    public Cursor selectLikeColumns() {
         return mDB.query(DiaryDB.CreateLike.LIKE_TBL, null, null, null, null, null, null);
     }
 
-    public boolean updateLikeColumn(int mv_id, String title, String mv_poster){
+    public boolean updateLikeColumn(int mv_id, String title, String mv_poster) {
         ContentValues values = new ContentValues();
         values.put(DiaryDB.CreateLike.MV_ID, mv_id);
         values.put(DiaryDB.CreateLike.TITLE, title);
@@ -155,9 +170,9 @@ public class DbOpenHelper {
 
     }
 
-    public boolean isExistLikeColumn(int mv_id){
-        Cursor c = mDB.rawQuery("SELECT * FROM like_tbl WHERE mv_id = "+mv_id, null);
-        return  c.getCount() > 0;
+    public boolean isExistLikeColumn(int mv_id) {
+        Cursor c = mDB.rawQuery("SELECT * FROM like_tbl WHERE mv_id = " + mv_id, null);
+        return c.getCount() > 0;
     }
 
     public void deleteLikeColumns(int mv_id) {
@@ -175,14 +190,14 @@ public class DbOpenHelper {
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db){
+        public void onCreate(SQLiteDatabase db) {
             db.execSQL(DiaryDB.CreateUser.CREATE_USR);
 
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-            db.execSQL("DROP TABLE IF EXISTS "+DiaryDB.CreateUser.USER_TBL);
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + DiaryDB.CreateUser.USER_TBL);
             onCreate(db);
         }
 
@@ -196,14 +211,14 @@ public class DbOpenHelper {
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db){
+        public void onCreate(SQLiteDatabase db) {
             db.execSQL(DiaryDB.CreatePosting.CREATE_POSTING);
 
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-            db.execSQL("DROP TABLE IF EXISTS "+DiaryDB.CreatePosting.POSTING_TBL);
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + DiaryDB.CreatePosting.POSTING_TBL);
             onCreate(db);
         }
 
@@ -217,14 +232,14 @@ public class DbOpenHelper {
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db){
+        public void onCreate(SQLiteDatabase db) {
             db.execSQL(DiaryDB.CreateLike.CREATE_LIKE);
 
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-            db.execSQL("DROP TABLE IF EXISTS "+DiaryDB.CreateLike.LIKE_TBL);
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + DiaryDB.CreateLike.LIKE_TBL);
             onCreate(db);
         }
 
