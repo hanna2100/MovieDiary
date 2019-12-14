@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,7 +25,7 @@ import com.example.user.moviediary.util.GlideApp;
 
 import java.util.Calendar;
 
-public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener {
+public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener, View.OnTouchListener {
     private Button btnEditCancel;
     private Button btnEditSave;
     private ImageView detailPosterImage;
@@ -90,6 +91,7 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener 
         detailDate.setOnClickListener(this);
         btnEditCancel.setOnClickListener(this);
         btnEditSave.setOnClickListener(this);
+        detailContent.setOnTouchListener(this);
 
         return view;
     }
@@ -133,8 +135,13 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener 
                         .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
 
                 break;
-
         }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        detailPosterImage.setVisibility(View.GONE);
+        return false;
     }
 }
 

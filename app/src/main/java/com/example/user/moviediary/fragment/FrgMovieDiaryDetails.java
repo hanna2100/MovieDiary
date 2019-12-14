@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,11 +13,15 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,10 +104,34 @@ public class FrgMovieDiaryDetails extends Fragment {
         date = getArguments().getString("date");
         content = getArguments().getString("content");
 
-        GlideApp.with(mContext).load(imageSource).fitCenter().into(detailPosterImage);
+        //카드뷰 크기세팅
+        CardView cardView = view.findViewById(R.id.cardView);
+        ViewGroup.LayoutParams cardParms = cardView.getLayoutParams();
+        cardParms.width = (int) (MainActivity.deviceWidth * 0.95);
+        cardView.setLayoutParams(cardParms);
+        //포스터이미지 크기세팅
+        ViewGroup.LayoutParams layoutParams = detailPosterImage.getLayoutParams();
+        layoutParams.width = (int) (MainActivity.deviceWidth * 0.95);
+        layoutParams.height = (int) ((MainActivity.deviceWidth * 0.95) * 1.45);
+        detailPosterImage.setLayoutParams(layoutParams);
+        GlideApp.with(mContext).load(imageSource).centerCrop().into(detailPosterImage);
+
         detailRatingBar.setRating(star);
         detailDate.setText(date);
-        detailContent.setText(title + "  " + content);
+
+        int titleLength = title.length();
+
+        String d_title = title;
+        String d_content = content;
+        String str = d_title + "  " + d_content;
+
+        str = str.replace(" ", "\u00A0");
+
+        SpannableStringBuilder customColor = new SpannableStringBuilder(str);
+        customColor.setSpan(new ForegroundColorSpan(Color.parseColor("#22243d")), 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        customColor.setSpan(new StyleSpan(Typeface.BOLD), 0, titleLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        detailContent.setText(customColor);
 
         setTags(detailContent, detailContent.getText().toString());
 

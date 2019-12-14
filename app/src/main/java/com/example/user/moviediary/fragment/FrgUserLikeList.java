@@ -44,8 +44,8 @@ public class FrgUserLikeList extends Fragment {
         recyclerView.setLayoutManager(gridLayoutManager);
 
         insertList();
-
         adapter = new MovieLikeAdapter(R.layout.item_user, list);
+
         recyclerView.setAdapter(adapter);
         Log.d("ViewPager", "likelist size = "+list.size());
         return view;

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.fragment.FrgMovieDetails;
 import com.example.user.moviediary.model.MovieDiary;
 import com.example.user.moviediary.util.GlideApp;
 
@@ -41,7 +42,7 @@ public class MovieLikeAdapter extends RecyclerView.Adapter<MovieLikeAdapter.Cust
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, final int i) {
 
-        MovieDiary movieDiary = list.get(i);
+        final MovieDiary movieDiary = list.get(i);
 
         Log.d("TAG",movieDiary.getDetailTitle());
 
@@ -50,8 +51,7 @@ public class MovieLikeAdapter extends RecyclerView.Adapter<MovieLikeAdapter.Cust
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"찜",Toast.LENGTH_SHORT).show();
-            }
+                ((MainActivity) context).setChangeFragment(FrgMovieDetails.newInstance(movieDiary.getMv_id()));                 }
         });
     }
 
