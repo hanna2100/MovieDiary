@@ -91,14 +91,14 @@ public class DbOpenHelper {
         ContentValues values = new ContentValues();
         values.put(DiaryDB.CreateUser.NAME, name);
         values.put(DiaryDB.CreateUser.PROFILE_IMG, profile_img);
-        values.put(DiaryDB.CreateUser.DIARY_DESC, diary_desc);
         values.put(DiaryDB.CreateUser.KAKAO_LOGIN, kakao_login);
-        return mDB.update(DiaryDB.CreateUser.USER_TBL, values, "NAME=" + name, null) > 0;
+        values.put(DiaryDB.CreateUser.DIARY_DESC, diary_desc);
+        return mDB.update(DiaryDB.CreateUser.USER_TBL, values, "name=" + "'" + name + "'", null) > 0;
 
     }
 
     public void deleteUserColumns(String name) {
-        mDB.delete(DiaryDB.CreateUser.USER_TBL, "NAME=" + name, null);
+        mDB.delete(DiaryDB.CreateUser.USER_TBL, "name=" + "'" + name + "'", null);
 
     }
 

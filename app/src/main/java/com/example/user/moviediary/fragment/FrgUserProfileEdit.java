@@ -3,9 +3,11 @@ package com.example.user.moviediary.fragment;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -19,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,10 +32,15 @@ import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.model.UserData;
+import com.example.user.moviediary.util.DbOpenHelper;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,15 +56,22 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
 
     private DrawerLayout profileMainLayout;
     private LinearLayout profileDrawerLayout;
+
     private CircleImageView profileImage;
-    private Button btnEditProfileImage, btnEditCancel, btnEditSave;
-    private EditText txtEmail, txtPassword, txtPasswordCheck, txtNickname, txtMySelf;
+    private Button btnEditProfileImage, btnEditCancel, btnEditSave, btnAdultCheck;
+    private EditText txtName, txtDescription;
 
     private File tempFile;
+    private File copyFile;
+    private String profileImgPath;
 
+    private DbOpenHelper dbOpenHelper;
     // 리퀘스트코드
     private static final int PICK_FROM_CAMERA = 2;
     private static final int PICK_FROM_ALBUM = 1;
+
+    //Shared Preference 키값
+    private static final String USER = "User", INIT = "init";
 
     public static FrgUserProfileEdit newInstance() {
         FrgUserProfileEdit fragment = new FrgUserProfileEdit();
@@ -77,15 +92,21 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
         view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         profileMainLayout = view.findViewById(R.id.profileMainLayout);
         profileDrawerLayout = view.findViewById(R.id.profileDrawerLayout);
+
         profileImage = view.findViewById(R.id.profileImage);
+
         btnEditProfileImage = view.findViewById(R.id.btnEditProfileImage);
         btnEditCancel = view.findViewById(R.id.btnEditCancel);
         btnEditSave = view.findViewById(R.id.btnEditSave);
-        txtEmail = view.findViewById(R.id.txtEmail);
-        txtPassword = view.findViewById(R.id.txtPassword);
-        txtPasswordCheck = view.findViewById(R.id.txtPasswordCheck);
-        txtNickname = view.findViewById(R.id.txtNickname);
-        txtMySelf = view.findViewById(R.id.txtMySelf);
+        btnAdultCheck = view.findViewById(R.id.btnAdultCheck);
+
+        txtName = view.findViewById(R.id.txtName);
+        txtDescription = view.findViewById(R.id.txtDescription);
+
+        // 초기 세팅
+        setupProfile();
+        // 이름은 수정하지 못함
+        txtName.setEnabled(false);
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -112,8 +133,33 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
 
         btnEditProfileImage.setOnClickListener(this);
         btnEditCancel.setOnClickListener(this);
+        btnEditSave.setOnClickListener(this);
 
         return view;
+    }
+
+    private void setupProfile() {
+        txtName.setText(UserData.userName);
+        txtDescription.setText(UserData.diaryDescription);
+        if (UserData.profileImgPath != null)
+            profileImage.setImageURI(Uri.parse(UserData.profileImgPath));
+        else {
+            profileImage.setImageResource(R.drawable.user_default_image);
+            profileImage.setColorFilter(MainActivity.mainColor);
+        }
+        if (UserData.kakaoLogin == 0) {
+            btnAdultCheck.setText("성인인증하기");
+            btnAdultCheck.setBackgroundColor(Color.LTGRAY);
+            btnAdultCheck.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 카카오톡 열어서 성인인증 하게 해,,,?
+                }
+            });
+        } else if (UserData.kakaoLogin == 1) {
+            btnAdultCheck.setText("완료");
+            btnAdultCheck.setBackgroundColor(Color.YELLOW);
+        }
     }
 
     @Override
@@ -178,7 +224,35 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                 break;
             case R.id.btnEditCancel:
                 ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                break;
+            case R.id.btnEditSave:
+                String description = txtDescription.getText().toString().trim();
+                String name = txtName.getText().toString().trim();
 
+                if (!description.equals("") && !name.equals("")) {
+
+                    Log.d("User_check", name + ", " + description + ", " + profileImgPath);
+
+                    //디비에 저장
+                    dbOpenHelper = new DbOpenHelper(getContext());
+                    dbOpenHelper.openUser();
+                    dbOpenHelper.updateUserColumn(name, profileImgPath, description, 0);
+//                    dbOpenHelper.upgradeUserHelper();
+//                    dbOpenHelper.createUserHelper();
+//                    dbOpenHelper.insertUserColumn(name, profileImgPath, description, 0);
+                    dbOpenHelper.close();
+
+
+                    //프로필 설정 완료했음을 저장
+                    SharedPreferences.Editor editor = mContext.getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
+                    editor.putBoolean(INIT, true);
+                    editor.apply();
+
+                    ((MainActivity) mContext).setupUserProfile();
+                    ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                } else {
+                    Toast.makeText(mContext, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -209,7 +283,6 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                 }
 
                 Bitmap bitmapTemp = rotate(originalBm, exifDegree);
-
                 profileImage.setImageBitmap(bitmapTemp);
             } else if (requestCode == PICK_FROM_ALBUM) {
 
@@ -230,17 +303,55 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                     cursor.moveToFirst();
 
                     tempFile = new File(cursor.getString(column_index));
+                    copyFile = createImageFile();
 
+                    Thread copyImage = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            FileInputStream fi = null;
+                            FileOutputStream fo = null;
+                            byte[] buf = null;
+
+                            try {
+                                fi = new FileInputStream(tempFile.getAbsolutePath());
+                                fo = new FileOutputStream(copyFile.getAbsolutePath());
+
+                                buf = new byte[1024];
+
+                                int length;
+                                while ((length = fi.read(buf)) > 0) {
+                                    fo.write(buf, 0, length);
+                                    //파일 전부를 옮길때까지 이걸 반복
+                                }
+                                fo.flush();
+
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            final Bitmap originalBm = BitmapFactory.decodeFile(copyFile.getAbsolutePath(), options);
+
+                            ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    profileImage.setImageBitmap(originalBm);
+                                }
+                            });
+                        }
+                    });
+
+                    copyImage.start();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 } finally {
                     if (cursor != null) {
                         cursor.close();
                     }
                 }
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                Bitmap originalBm = BitmapFactory.decodeFile(tempFile.getAbsolutePath(), options);
-                profileImage.setImageBitmap(originalBm);
-
             }
         }
     }
@@ -294,6 +405,8 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
 
         // 빈 파일 생성
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        //이미지경로저장
+        profileImgPath = image.getAbsolutePath();
 
         return image;
     }

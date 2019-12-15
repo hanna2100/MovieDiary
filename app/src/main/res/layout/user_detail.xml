@@ -47,24 +47,16 @@
 
 
                         <TextView
-                            android:id="@+id/detailNickname"
+                            android:id="@+id/detailName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="닉네임"
+                            android:text="이름"
                             android:maxLines="1"
                             android:ellipsize="end"
                             android:textColor="@color/colorFeedId"
                             android:textSize="17sp"
                             android:textStyle="bold"
-                            android:layout_gravity="center_vertical"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0000-00-00"
-                            android:textColor="#cccccc"
-                            android:textSize="13sp"
                             android:layout_gravity="center_vertical"/>
 
                         <ImageButton

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.model.MovieDiary;
+import com.example.user.moviediary.model.UserData;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
@@ -47,7 +49,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FrgMovieDiaryDetails extends Fragment {
     private CircleImageView detailProfileImage;
-    private TextView detailNickname;
+    private TextView detailName;
     private ImageButton ibOption;
     private ImageView detailPosterImage;
     private RatingBar detailRatingBar;
@@ -88,13 +90,16 @@ public class FrgMovieDiaryDetails extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = View.inflate(mContext, R.layout.user_detail, null);
         detailProfileImage = view.findViewById(R.id.detailProfileImage);
-        detailNickname = view.findViewById(R.id.detailNickname);
+        detailName = view.findViewById(R.id.detailName);
         ibOption = view.findViewById(R.id.ibOption);
         detailPosterImage = view.findViewById(R.id.detailPosterImage);
         detailRatingBar = view.findViewById(R.id.detailRatingBar);
         detailDate = view.findViewById(R.id.detailDate);
         detailContent = view.findViewById(R.id.detailContent);
 
+        // 프로필 이미지, 이름 설정
+        setupProfile();
+        
         dbOpenHelper = new DbOpenHelper(mContext);
 
         mv_id = getArguments().getInt("mv_id");
@@ -179,6 +184,16 @@ public class FrgMovieDiaryDetails extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         return view;
+    }
+
+    private void setupProfile() {
+        detailName.setText(UserData.userName);
+        if (UserData.profileImgPath != null)
+            detailProfileImage.setImageURI(Uri.parse(UserData.profileImgPath));
+        else {
+            detailProfileImage.setImageResource(R.drawable.user_default_image);
+            detailProfileImage.setColorFilter(MainActivity.mainColor);
+        }
     }
 
     // 목록에서 한 게시물을 클릭했을때 #이 붙은 해시태그가 있으면 색깔 변하게 해주고, 그 해시태그 클릭이벤트 해줘!

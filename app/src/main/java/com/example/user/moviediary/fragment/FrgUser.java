@@ -65,7 +65,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
     private CircleImageView userImage;
 
     private MovieDiaryAdapter movieDiaryAdapter;
-    private ArrayList<MovieDiary> list = new ArrayList<>();
+    private ArrayList<MovieDiary> diaryList = new ArrayList<>();
+    private ArrayList<MovieDiary> wishList = new ArrayList<>();
     private Context mContext;
     private Activity mActivity;
     private View view;
@@ -74,6 +75,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     private WrapContentHeightViewPager viewPager;
     private Adapter adapter;
+
+    private DbOpenHelper dbOpenHelper;
 
     public static FrgUser newInstance() {
         FrgUser fragment = new FrgUser();
@@ -116,9 +119,13 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
         userImage = view.findViewById(R.id.userImage);
 
-        LinearLayout hideLayout = view.findViewById(R.id.hideLayout);
         flTop = view.findViewById(R.id.flTop);
         viewPager = view.findViewById(R.id.viewPager);
+
+        // 게시물 수 세팅
+        diaryCountSetting();
+        // 찜 수 세팅
+        wishCountSetting();
 
         //액션바 숨기기
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -140,6 +147,49 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         mainLayout.setDrawerListener(listener);
 
         return view;
+    }
+
+
+
+    private void diaryCountSetting() {
+        diaryList.clear();
+        dbOpenHelper = new DbOpenHelper(getContext());
+        dbOpenHelper.openPosting();
+        dbOpenHelper.createPostingHelper();
+        Cursor cursor = dbOpenHelper.selectPostingColumns();
+
+        while (cursor.moveToNext()) {
+            int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+            String tempTitle = cursor.getString(cursor.getColumnIndex("title"));
+            String tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
+            String tempMovieDate = cursor.getString(cursor.getColumnIndex("mv_date"));
+            String tempPostingDate = cursor.getString(cursor.getColumnIndex("post_date"));
+            float tempStar = cursor.getFloat(cursor.getColumnIndex("star"));
+            String tempContent = cursor.getString(cursor.getColumnIndex("content"));
+
+            diaryList.add(new MovieDiary(tempMvId,tempPoster,tempTitle,tempStar,tempMovieDate,tempContent));
+        }
+        diaryCount.setText(String.valueOf(diaryList.size()));
+        dbOpenHelper.close();
+    }
+
+    private void wishCountSetting() {
+        wishList.clear();
+        dbOpenHelper = new DbOpenHelper(getContext());
+        dbOpenHelper.openLike();
+        dbOpenHelper.createLikeHelper();
+        Cursor cursor = dbOpenHelper.selectLikeColumns();
+
+        while (cursor.moveToNext()) {
+            int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+            String tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
+            String tempTitle = cursor.getString(cursor.getColumnIndex("title"));
+
+            wishList.add(new MovieDiary(tempMvId,tempPoster,tempTitle));
+        }
+        wishCount.setText(String.valueOf(wishList.size()));
+
+        dbOpenHelper.close();
     }
 
     private void setupProfile() {

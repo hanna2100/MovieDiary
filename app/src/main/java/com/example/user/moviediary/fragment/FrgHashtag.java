@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieHashtagAdapter;
@@ -31,6 +32,7 @@ public class FrgHashtag extends Fragment {
 
     private DbOpenHelper dbOpenHelper;
     private RecyclerView rcvHashtag;
+    private EditText edtHashTag;
 
     private String tag;
 
@@ -66,6 +68,7 @@ public class FrgHashtag extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_hashtag, container, false);
 
+        edtHashTag = view.findViewById(R.id.edtHashTag);
         rcvHashtag = view.findViewById(R.id.rcvHashtag);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 3);
         rcvHashtag.setLayoutManager(gridLayoutManager);
@@ -74,6 +77,7 @@ public class FrgHashtag extends Fragment {
 
         insertList();
 
+        edtHashTag.setText(tag);
         adapter = new MovieHashtagAdapter(R.layout.item_user, list);
         rcvHashtag.setAdapter(adapter);
 
