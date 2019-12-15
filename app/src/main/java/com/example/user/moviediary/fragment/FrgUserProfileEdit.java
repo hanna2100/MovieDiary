@@ -54,11 +54,8 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
     private Context mContext;
     private View view;
 
-    private DrawerLayout profileMainLayout;
-    private LinearLayout profileDrawerLayout;
-
     private CircleImageView profileImage;
-    private Button btnEditProfileImage, btnEditCancel, btnEditSave, btnAdultCheck;
+    private Button btnEditProfileImage, btnEditCancel, btnEditSave;
     private EditText txtName, txtDescription;
 
     private File tempFile;
@@ -90,15 +87,12 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_user_profile, container, false);
-        profileMainLayout = view.findViewById(R.id.profileMainLayout);
-        profileDrawerLayout = view.findViewById(R.id.profileDrawerLayout);
 
         profileImage = view.findViewById(R.id.profileImage);
 
         btnEditProfileImage = view.findViewById(R.id.btnEditProfileImage);
         btnEditCancel = view.findViewById(R.id.btnEditCancel);
         btnEditSave = view.findViewById(R.id.btnEditSave);
-        btnAdultCheck = view.findViewById(R.id.btnAdultCheck);
 
         txtName = view.findViewById(R.id.txtName);
         txtDescription = view.findViewById(R.id.txtDescription);
@@ -147,19 +141,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
             profileImage.setImageResource(R.drawable.user_default_image);
             profileImage.setColorFilter(MainActivity.mainColor);
         }
-        if (UserData.kakaoLogin == 0) {
-            btnAdultCheck.setText("성인인증하기");
-            btnAdultCheck.setBackgroundColor(Color.LTGRAY);
-            btnAdultCheck.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 카카오톡 열어서 성인인증 하게 해,,,?
-                }
-            });
-        } else if (UserData.kakaoLogin == 1) {
-            btnAdultCheck.setText("완료");
-            btnAdultCheck.setBackgroundColor(Color.YELLOW);
-        }
+
     }
 
     @Override

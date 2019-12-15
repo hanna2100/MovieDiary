@@ -1,5 +1,6 @@
 package com.example.user.moviediary;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private long backbtnTime = 0l;
     private DbOpenHelper dbOpenHelper;
+    private BottomNavigationView bottomMenu;
 
     ThemeColors themeColors;
 
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         themeColors = new ThemeColors(MainActivity.this);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomMenu = findViewById(R.id.bottomMenu);
+        bottomMenu = findViewById(R.id.bottomMenu);
         FrameLayout mainFrame = findViewById(R.id.mainFrame);
         dbOpenHelper = new DbOpenHelper(this);
 
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isInitialized = prefUser.getBoolean(INIT, false);
         if (isInitialized == false) {
             setChangeFragment(FrgUserJoin.newInstance());
-        }else if(isInitialized ==true && isPressedTheme==false){
+        } else if (isInitialized == true && isPressedTheme == false) {
             setChangeFragment(FrgMovieHome.newInstance());
             setupUserProfile();
         }
@@ -112,17 +114,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // This will get you total fragment in the backStack
+        //테마를 바꾸면 isPressedTheme = true 가 되는데 앱을 완전종료하지 않는이상 이 값이 변하지 않으므로
+        //뒤로가기버튼을 누르면 수시로 false 가 되게 함
+        if (isPressedTheme == true)
+            isPressedTheme = false;
 
-        long curentTime = System.currentTimeMillis();
-        long getTime = curentTime - backbtnTime;
+        //두번연속 0.6초내에 누르면 앱이 종료됨
+        long currentTime = System.currentTimeMillis();
+        long getTime = currentTime - backbtnTime;
 
-        if (getTime >= 0 && getTime < 500) {
+        if (getTime >= 0 && getTime < 600) {
             finish();
         } else {
-            backbtnTime = curentTime;
+            backbtnTime = currentTime;
             super.onBackPressed();
         }
+
     }
 
     public void setChangeFragment(Fragment fragment) {
@@ -147,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             UserData.diaryDescription = cursor.getString(cursor.getColumnIndex("diary_desc"));
             UserData.kakaoLogin = cursor.getInt(cursor.getColumnIndex("kakao_login"));
         }
-        Log.d("유저데이터", UserData.userName+UserData.profileImgPath+UserData.diaryDescription+UserData.kakaoLogin);
+        Log.d("유저데이터", UserData.userName + UserData.profileImgPath + UserData.diaryDescription + UserData.kakaoLogin);
         dbOpenHelper.close();
     }
 

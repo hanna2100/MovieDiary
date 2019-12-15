@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +56,6 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private RecyclerView rcvLatestMovie;
     private LinearLayout layoutView;
-    private ScrollView scrollView;
     private TextView tvPopularTitle, tvPopularOverview;
     private Button btnPopularMore;
     private ImageView ivPopularPoster;
@@ -98,7 +98,6 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         layoutView = view.findViewById(R.id.layoutView);
-        scrollView = view.findViewById(R.id.scrollView);
         ivPopularPoster = view.findViewById(R.id.ivPopularPoster);
         tvPopularTitle = view.findViewById(R.id.tvPopularTitle);
         tvPopularOverview = view.findViewById(R.id.tvPopularOverview);
@@ -343,19 +342,12 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
             //레이아웃 어댑터 설정
             adapter = new MovieChartAdapter(R.layout.item_movie_chart, list);
             recyclerView.setAdapter(adapter);
+            ViewCompat.setNestedScrollingEnabled(recyclerView,false);
 
 
             //프로그레스바 제거
             progressDialog.dismiss();
             layoutView.setVisibility(View.VISIBLE);
-
-            //스크롤올리기
-            scrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView.scrollTo(0, 0);
-                }
-            });
 
             super.onPostExecute(result);
         }
