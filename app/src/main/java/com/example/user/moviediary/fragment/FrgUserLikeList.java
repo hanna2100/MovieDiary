@@ -43,7 +43,7 @@ public class FrgUserLikeList extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext,3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        insertList();
+        insertList("like_tbl","no DESC");
         adapter = new MovieLikeAdapter(R.layout.item_user, list);
 
         recyclerView.setAdapter(adapter);
@@ -52,13 +52,12 @@ public class FrgUserLikeList extends Fragment {
 
     }
 
-    private void insertList() {
+    private void insertList(String tbl_name, String sort) {
 
         list.clear();
         dbOpenHelper = new DbOpenHelper(getContext());
-        dbOpenHelper.openLike();
-        dbOpenHelper.createLikeHelper();
-        Cursor cursor = dbOpenHelper.selectLikeColumns();
+        dbOpenHelper.openPosting();
+        Cursor cursor = dbOpenHelper.sortColumn(tbl_name,sort);
 
         while (cursor.moveToNext()) {
             int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
