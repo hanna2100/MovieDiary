@@ -15,7 +15,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -30,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.UserJoinActivity;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
@@ -71,8 +71,6 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
 
     public static FrgUserJoinDefault newInstance() {
         FrgUserJoinDefault fragment = new FrgUserJoinDefault();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -116,7 +114,7 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.btnCancel:
-                ((MainActivity) mContext).onBackPressed();
+                ((UserJoinActivity)mContext).onBackPressed();
                 break;
 
             case R.id.btnNext:
@@ -139,8 +137,8 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
                     editor.apply();
 
                     Log.d(TAG, name + ", " + description + ", " + profileImgPath);
-                    ((MainActivity) mContext).setupUserProfile();
-                    ((MainActivity) mContext).setChangeFragment(FrgMovieHome.newInstance());
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    startActivity(intent);
                 } else {
                     Toast.makeText(mContext, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -172,6 +170,7 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
     }
 
     private void setupProfileImageDialog() {
+
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(mContext);
         bottomSheetDialog.setContentView(R.layout.user_profile_image_dialog);
         Button btnPofileImageDelete = bottomSheetDialog.findViewById(R.id.btnPofileImageDelete);
@@ -237,7 +236,7 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
             if (requestCode == PICK_FROM_CAMERA) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 Bitmap originalBm = BitmapFactory.decodeFile(tempFile.getAbsolutePath(), options);
-
+                Log.d("태그", "originalBm="+originalBm);
                 ExifInterface exifInterface = null;
                 // 속성을 체크해야된다.
                 try {
@@ -309,7 +308,7 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
                             BitmapFactory.Options options = new BitmapFactory.Options();
                             final Bitmap originalBm = BitmapFactory.decodeFile(copyFile.getAbsolutePath(), options);
 
-                            ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                            ((UserJoinActivity) mContext).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     profileImage.setImageBitmap(originalBm);

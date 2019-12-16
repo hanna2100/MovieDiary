@@ -1,5 +1,8 @@
 package com.example.user.moviediary.util;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.user.moviediary.model.MovieDetails;
@@ -17,6 +20,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MoviesRepository {
 
+    private static final String INCLUDE_ADULT = "Include_adult", ADULT = "adult";
+
     private final String TAG = "MovieDetails";
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
@@ -24,7 +29,7 @@ public class MoviesRepository {
     private static String query = "";
     private static String region = "KR";
     private static int page = 1;
-    private static boolean include_adult = false;
+    private boolean include_adult = false;
 
     private static MoviesRepository repository;
 
@@ -49,7 +54,12 @@ public class MoviesRepository {
     }
 
     /* 영화 검색 메소드 시작 */
-    public void getSearchedMovieResult(final OnGetMoviesCallback callback) {
+    public void getSearchedMovieResult(Context context, final OnGetMoviesCallback callback) {
+
+        SharedPreferences pref = context.getSharedPreferences(INCLUDE_ADULT,Activity.MODE_PRIVATE);
+        boolean check = pref.getBoolean(ADULT,false);
+        include_adult = check;
+        Log.d("태그", "성인영화포함여부="+include_adult);
 
         Call<SearchResults> call = api.searchMovies(DeveloperKey.TMDB, LANGUAGE, query, page, include_adult);
         call.enqueue(new Callback<SearchResults>() {
@@ -80,10 +90,6 @@ public class MoviesRepository {
 
     public static void setPage(int PAGE) {
         MoviesRepository.page = PAGE;
-    }
-
-    public static void setIncludeAdult(boolean includeAdult) {
-        include_adult = includeAdult;
     }
 
     public static int getPage() {

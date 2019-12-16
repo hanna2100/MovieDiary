@@ -91,7 +91,7 @@ public class FrgMovieSearch extends Fragment {
                 if (lastVisibleItemPosition == (itemTotalCount - 1) && itemTotalCount % 20 == 0) {
 
                     MoviesRepository.switchToTheNextPage();
-                    moviesRepository.getSearchedMovieResult(new OnGetMoviesCallback() {
+                    moviesRepository.getSearchedMovieResult(mContext,new OnGetMoviesCallback() {
                         @Override
                         public void onSuccess(List<SearchResults.ResultsBean> resultsBeanList) {
                             list.addAll(resultsBeanList);
@@ -157,7 +157,7 @@ public class FrgMovieSearch extends Fragment {
         MoviesRepository.setQuery(query);
         MoviesRepository.setPage(1);
         moviesRepository = MoviesRepository.getInstance();
-        moviesRepository.getSearchedMovieResult(new OnGetMoviesCallback() {
+        moviesRepository.getSearchedMovieResult(mContext, new OnGetMoviesCallback() {
             @Override
             public void onSuccess(List<SearchResults.ResultsBean> resultsBeanList) {
                 list = resultsBeanList;

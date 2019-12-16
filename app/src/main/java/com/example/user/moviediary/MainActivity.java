@@ -1,13 +1,12 @@
 package com.example.user.moviediary;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -17,14 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.example.user.moviediary.fragment.FrgMovieHome;
 import com.example.user.moviediary.fragment.FrgMovieSearch;
 import com.example.user.moviediary.fragment.FrgPosting;
 import com.example.user.moviediary.fragment.FrgUser;
-import com.example.user.moviediary.fragment.FrgUserJoin;
 import com.example.user.moviediary.fragment.ThemeColors;
 import com.example.user.moviediary.model.UserData;
 import com.example.user.moviediary.util.DbOpenHelper;
@@ -40,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private long backbtnTime = 0l;
     private DbOpenHelper dbOpenHelper;
     private BottomNavigationView bottomMenu;
+
+    // 뒤로가기 버튼 입력시간이 담길 long 객체
+    private long pressedTime = 0;
+    // 뒤로가기 버튼 리스너 객체 생성
+    private OnBackPressedListener mBackListener;
 
     ThemeColors themeColors;
 
@@ -73,8 +76,12 @@ public class MainActivity extends AppCompatActivity {
         //최초로그인 확인하기 & 최초로그인 아닐 시 첫 화면을 홈화면으로 설정
         SharedPreferences prefUser = getSharedPreferences(USER, Context.MODE_PRIVATE);
         boolean isInitialized = prefUser.getBoolean(INIT, false);
+
         if (isInitialized == false) {
-            setChangeFragment(FrgUserJoin.newInstance());
+            Intent intent = new Intent(this, UserJoinActivity.class);
+            startActivity(intent);
+            finish();
+
         } else if (isInitialized == true && isPressedTheme == false) {
             setChangeFragment(FrgMovieHome.newInstance());
             setupUserProfile();
@@ -112,24 +119,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public interface OnBackPressedListener {
+        public void onBack();
+    }
+
+    // 리스너 설정 메소드
+    public void setOnBackPressedListener(OnBackPressedListener listener) {
+        mBackListener = listener;
+    }
+
     @Override
     public void onBackPressed() {
         //테마를 바꾸면 isPressedTheme = true 가 되는데 앱을 완전종료하지 않는이상 이 값이 변하지 않으므로
         //뒤로가기버튼을 누르면 수시로 false 가 되게 함
+
         if (isPressedTheme == true)
             isPressedTheme = false;
 
-        //두번연속 0.6초내에 누르면 앱이 종료됨
-        long currentTime = System.currentTimeMillis();
-        long getTime = currentTime - backbtnTime;
-
-        if (getTime >= 0 && getTime < 600) {
-            finish();
+        // 다른 Fragment 에서 리스너를 설정했을 때 처리됩니다.
+        if(mBackListener != null) {
+            mBackListener.onBack();
+            Log.e("!!!", "Listener is not null");
+            // 리스너가 설정되지 않은 상태(예를들어 메인Fragment)라면
+            // 뒤로가기 버튼을 연속적으로 두번 눌렀을 때 앱이 종료됩니다.
         } else {
-            backbtnTime = currentTime;
-            super.onBackPressed();
-        }
+            Log.e("!!!", "Listener is null");
+            if ( pressedTime == 0 ) {
+                Toast.makeText(getApplicationContext(), " 한 번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
+                pressedTime = System.currentTimeMillis();
+            }
+            else {
+                int seconds = (int) (System.currentTimeMillis() - pressedTime);
 
+                if ( seconds > 600 ) {
+                    Toast.makeText(getApplicationContext(), " 한 번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
+                    pressedTime = 0 ;
+                }
+                else {
+                    super.onBackPressed();
+                    Log.e("!!!", "onBackPressed : finish, killProcess");
+                    finish();
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+            }
+        }
     }
 
     public void setChangeFragment(Fragment fragment) {
@@ -154,8 +187,7 @@ public class MainActivity extends AppCompatActivity {
             UserData.diaryDescription = cursor.getString(cursor.getColumnIndex("diary_desc"));
             UserData.kakaoLogin = cursor.getInt(cursor.getColumnIndex("kakao_login"));
         }
-        Log.d("유저데이터", UserData.userName + UserData.profileImgPath + UserData.diaryDescription + UserData.kakaoLogin);
+        Log.d("태그", UserData.userName + UserData.profileImgPath + UserData.diaryDescription + UserData.kakaoLogin);
         dbOpenHelper.close();
     }
-
 }

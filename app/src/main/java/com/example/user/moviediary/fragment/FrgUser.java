@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,31 +15,37 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.UserJoinActivity;
 import com.example.user.moviediary.adapter.MovieDiaryAdapter;
 import com.example.user.moviediary.model.MovieDiary;
 import com.example.user.moviediary.model.UserData;
 import com.example.user.moviediary.util.DbOpenHelper;
+import com.example.user.moviediary.util.GlideApp;
 import com.example.user.moviediary.util.WrapContentHeightViewPager;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.UnLinkResponseCallback;
+import com.kakao.util.helper.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +57,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     //Shared Preference 키값
     private static final String USER = "User", INIT = "init";
+    private static final String INCLUDE_ADULT = "Include_adult", ADULT = "adult";
 
     private DrawerLayout mainLayout;
     private LinearLayout drawerLayout;
@@ -77,6 +82,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
     private Adapter adapter;
 
     private DbOpenHelper dbOpenHelper;
+    private SharedPreferences pref;
 
     public static FrgUser newInstance() {
         FrgUser fragment = new FrgUser();
@@ -124,6 +130,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
         // 게시물 수 세팅
         diaryCountSetting();
+
         // 찜 수 세팅
         wishCountSetting();
 
@@ -144,11 +151,26 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         btnMail.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
         drawerLayout.setOnTouchListener(this);
+
+        switchAdult.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(UserData.kakaoLogin!=2){
+                    switchAdult.setChecked(false);
+                    Toast.makeText(mContext, "카카오톡에 연령대 정보를 입력하지 않아 해당 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }else {
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(ADULT, isChecked);
+                    editor.commit();
+                }
+            }
+        });
+
         mainLayout.setDrawerListener(listener);
 
         return view;
     }
-
 
 
     private void diaryCountSetting() {
@@ -167,7 +189,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
             float tempStar = cursor.getFloat(cursor.getColumnIndex("star"));
             String tempContent = cursor.getString(cursor.getColumnIndex("content"));
 
-            diaryList.add(new MovieDiary(tempMvId,tempPoster,tempTitle,tempStar,tempMovieDate,tempContent));
+            diaryList.add(new MovieDiary(tempMvId, tempPoster, tempTitle, tempStar, tempMovieDate, tempContent));
         }
         diaryCount.setText(String.valueOf(diaryList.size()));
         dbOpenHelper.close();
@@ -185,7 +207,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
             String tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
             String tempTitle = cursor.getString(cursor.getColumnIndex("title"));
 
-            wishList.add(new MovieDiary(tempMvId,tempPoster,tempTitle));
+            wishList.add(new MovieDiary(tempMvId, tempPoster, tempTitle));
         }
         wishCount.setText(String.valueOf(wishList.size()));
 
@@ -197,14 +219,25 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         userName.setText(UserData.userName);
         diaryDesc.setText(UserData.diaryDescription);
         if (UserData.profileImgPath != null)
-            userImage.setImageURI(Uri.parse(UserData.profileImgPath));
+            if (UserData.kakaoLogin == 0) {//카톡로그인아니면서 이미지따로 설정한경우
+                userImage.setImageURI(Uri.parse(UserData.profileImgPath));
+            } else {//카톡로그인이면서 이미지 따로 있는경우
+                GlideApp.with(view).load(UserData.profileImgPath)
+                        .fitCenter()
+                        .into(userImage);
+            }
         else {
             userImage.setImageResource(R.drawable.user_default_image);
             userImage.setColorFilter(MainActivity.mainColor);
         }
-        if (UserData.kakaoLogin == 0)
+        if (UserData.kakaoLogin == 0) {
             switchAdult.setEnabled(false);
-        Log.d("유저데이터", "프레그="+UserData.userName+UserData.profileImgPath+UserData.diaryDescription+UserData.kakaoLogin);
+        }else{
+            //성인영화포함여부 스위치 세팅
+            pref = mContext.getSharedPreferences(INCLUDE_ADULT,Activity.MODE_PRIVATE);  // UI 상태를 저장합니다.
+            boolean isIncludedAD = pref.getBoolean(ADULT, false);
+            switchAdult.setChecked(isIncludedAD);
+        }
 
     }
 
@@ -300,29 +333,21 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        //db테이블 모두 드롭후 재생성
-                        DbOpenHelper dbOpenHelper = new DbOpenHelper(mContext);
-                        dbOpenHelper.openUser();
-                        dbOpenHelper.upgradeUserHelper();
-                        dbOpenHelper.openLike();
-                        dbOpenHelper.upgradeLikeHelper();
-                        dbOpenHelper.openPosting();
-                        dbOpenHelper.upgradePostingHelper();
-                        dbOpenHelper.close();
+                        if (UserData.kakaoLogin != 0) {
+                            onClickLogout();
 
-                        //프로필이 설정되지 않음을 저장
-                        SharedPreferences.Editor editor = mContext.getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
-                        editor.putBoolean(INIT, false);
-                        editor.apply();
+                        } else {
+                            userDatabaseRecreate();
+                            //액티비티 recreate
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                                mActivity.recreate();
 
-                        //액티비티 recreate
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                            mActivity.recreate();
+                            else {
+                                Intent i = mActivity.getPackageManager().getLaunchIntentForPackage(mActivity.getPackageName());
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                mActivity.startActivity(i);
+                            }
 
-                        else {
-                            Intent i = mActivity.getPackageManager().getLaunchIntentForPackage(mActivity.getPackageName());
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mActivity.startActivity(i);
                         }
                     }
                 });
@@ -379,6 +404,75 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         public CharSequence getPageTitle(int position) {
             return mFragmentTitles.get(position);
         }
+    }
+
+    //카톡 로그아웃시
+    private void onClickLogout() {
+
+        userDatabaseRecreate();
+
+        final String appendMessage = getString(R.string.com_kakao_confirm_unlink);
+        new AlertDialog.Builder(mContext)
+                .setMessage(appendMessage)
+                .setPositiveButton(getString(R.string.com_kakao_ok_button),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                UserManagement.getInstance().requestUnlink(new UnLinkResponseCallback() {
+                                    @Override
+                                    public void onFailure(ErrorResult errorResult) {
+                                        Logger.e(errorResult.toString());
+                                    }
+
+                                    @Override
+                                    public void onSessionClosed(ErrorResult errorResult) {
+                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                    }
+
+                                    @Override
+                                    public void onNotSignedUp() {
+                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                    }
+
+                                    @Override
+                                    public void onSuccess(Long userId) {
+                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                    }
+                                });
+                                dialog.dismiss();
+                            }
+                        })
+                .setNegativeButton(getString(R.string.com_kakao_cancel_button),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+    }
+
+    private void userDatabaseRecreate() {
+
+        //db테이블 모두 드롭후 재생성
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(mContext);
+        dbOpenHelper.openUser();
+        dbOpenHelper.upgradeUserHelper();
+        dbOpenHelper.openLike();
+        dbOpenHelper.upgradeLikeHelper();
+        dbOpenHelper.openPosting();
+        dbOpenHelper.upgradePostingHelper();
+        dbOpenHelper.close();
+
+        //프로필이 설정되지 않음을 저장
+        SharedPreferences.Editor editor = mContext.getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(INIT, false);
+        editor.apply();
+
+        //성인영화검색설정 false 로 저장
+        editor = mContext.getSharedPreferences(INCLUDE_ADULT, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(ADULT, false);
+        editor.apply();
+
     }
 
 }

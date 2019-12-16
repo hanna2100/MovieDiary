@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:name=".util.App">
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
@@ -25,6 +26,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        //처음로그인할때 뜨는 액티비티
+        <activity android:name=".UserJoinActivity">
         </activity>
 
         //김하늘 사진권한요청
@@ -38,6 +42,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/profile_image_file_path" />
         </provider>
+
+        //장한나림 카카오톡 키값요청
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
 
     </application>
 
