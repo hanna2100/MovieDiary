@@ -26,7 +26,6 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
     private ArrayList<MovieDiary> list;
     private View view;
     private Context context;
-    private DbOpenHelper dbOpenHelper;
 
     public MovieDiaryAdapter(int layout, ArrayList<MovieDiary> list) {
         this.layout = layout;
@@ -39,8 +38,6 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
         view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
         MovieDiaryAdapter.CustomViewHolder customViewHolder = new MovieDiaryAdapter.CustomViewHolder(view);
         context = viewGroup.getContext();
-
-        dbOpenHelper = new DbOpenHelper(context);
 
         return customViewHolder;
     }
@@ -55,13 +52,14 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 다이어리 상세정보 프래그먼트 띄움
-                ((MainActivity) context)
-                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(list.get(i).getMv_id(),list.get(i).getDetailImage(),
-                                list.get(i).getDetailTitle(),list.get(i).getDetailRatingBar(),
-                                list.get(i).getDetailDate(),list.get(i).getDetailReview()));
+                FrgMovieDiaryDetails dialog = (FrgMovieDiaryDetails.newInstance(list.get(i).getMv_id(),list.get(i).getDetailImage(),
+                        list.get(i).getDetailTitle(),list.get(i).getDetailRatingBar(),
+                        list.get(i).getDetailDate(),list.get(i).getDetailReview()));
+
+                dialog.show(((MainActivity)context).getSupportFragmentManager(), null);
             }
         });
+
     }
 
     @Override

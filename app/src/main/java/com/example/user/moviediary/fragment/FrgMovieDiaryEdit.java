@@ -1,15 +1,21 @@
 package com.example.user.moviediary.fragment;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -25,7 +31,7 @@ import com.example.user.moviediary.util.GlideApp;
 
 import java.util.Calendar;
 
-public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener  {
+public class FrgMovieDiaryEdit extends DialogFragment implements View.OnClickListener  {
 
     private Button btnEditCancel;
     private Button btnEditSave;
@@ -82,7 +88,19 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener 
         date = getArguments().getString("date");
         content = getArguments().getString("content");
 
-        GlideApp.with(mContext).load(imageSource).fitCenter().into(detailPosterImage);
+        //카드뷰 크기세팅
+        CardView cardView = view.findViewById(R.id.cardView);
+        ViewGroup.LayoutParams cardParms = cardView.getLayoutParams();
+        cardParms.width = (int) (MainActivity.deviceWidth * 0.95);
+        cardView.setLayoutParams(cardParms);
+
+        //포스터이미지 크기세팅
+        ViewGroup.LayoutParams layoutParams = detailPosterImage.getLayoutParams();
+        layoutParams.width = (int) (MainActivity.deviceWidth * 0.95);
+        layoutParams.height = (int) ((MainActivity.deviceWidth * 0.95) * 1.45);
+        detailPosterImage.setLayoutParams(layoutParams);
+        GlideApp.with(mContext).load(imageSource).centerCrop().into(detailPosterImage);
+
         detailRatingBar.setRating(star);
         detailDate.setText(date);
         detailContent.setText(content);
@@ -115,9 +133,9 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener 
                 break;
             case R.id.btnEditCancel:
                 Toast.makeText(mContext,"취소되었습니다.",Toast.LENGTH_SHORT).show();
-
-                ((MainActivity) mContext)
-                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, star, date, content));
+                dismiss();
+//                ((MainActivity) mContext)
+//                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, star, date, content));
                 break;
             case R.id.btnEditSave:
                 String editDate = detailDate.getText().toString();
@@ -130,11 +148,32 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener 
                 dbOpenHelper.close();
 
                 Toast.makeText(mContext,"다이어리가 수정되었습니다.",Toast.LENGTH_SHORT).show();
-
-                ((MainActivity) mContext)
-                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
+                FrgMovieDiaryDetails dialog = (FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
+                dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
+                dismiss();
+//                ((MainActivity) mContext)
+//                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
 
                 break;
+        }
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+        return dialog;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout((int) (MainActivity.deviceWidth * 0.95), ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
     }
 

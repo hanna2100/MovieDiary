@@ -1,26 +1,38 @@
 package com.example.user.moviediary.fragment;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -35,12 +47,11 @@ import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
-
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBackPressedListener {
-
+public class FrgMovieDiaryDetails extends DialogFragment implements MainActivity.OnBackPressedListener {
     private CircleImageView detailProfileImage;
     private TextView detailName;
     private ImageButton ibOption;
@@ -108,6 +119,7 @@ public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBac
         ViewGroup.LayoutParams cardParms = cardView.getLayoutParams();
         cardParms.width = (int) (MainActivity.deviceWidth * 0.95);
         cardView.setLayoutParams(cardParms);
+
         //포스터이미지 크기세팅
         ViewGroup.LayoutParams layoutParams = detailPosterImage.getLayoutParams();
         layoutParams.width = (int) (MainActivity.deviceWidth * 0.95);
@@ -117,7 +129,6 @@ public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBac
 
         detailRatingBar.setRating(star);
         detailDate.setText(date);
-
         detailContent.setText(content);
 
         //해시태그 이벤트
@@ -138,8 +149,10 @@ public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBac
                         // 수정 버튼 이벤트
                         bottomSheetDialog.dismiss();
                         // 다이어리 수정 프래그먼트 콜해줌
-                        ((MainActivity) mContext).setChangeFragment(FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
-
+                        //((MainActivity) mContext).setChangeFragment(FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
+                        FrgMovieDiaryEdit dialog = (FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
+                        dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
+                        dismiss();
                     }
                 });
                 btnDiaryDelete.setOnClickListener(new View.OnClickListener() {
@@ -183,14 +196,14 @@ public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBac
 
     private void setupProfile() {
         detailName.setText(UserData.userName);
-        // 카카오로그인이면 다이어리 상세페이지에 그냥 글라이드앱으로 프로필 이미지 세팅해줘용
-//        if (UserData.kakaoLogin != 0) {
-//            GlideApp.with(mContext).load(UserData.profileImgPath).into(detailProfileImage);
-//        }
 
-        if (UserData.profileImgPath != null)
+        if (UserData.profileImgPath != null) {//이미지 따로 설정한 경우임
+            if (UserData.kakaoLogin != 0) {//카카오톡 로그인 유저인 경우
+                GlideApp.with(mContext).load(UserData.profileImgPath).into(detailProfileImage);
+            }
             detailProfileImage.setImageURI(Uri.parse(UserData.profileImgPath));
-        else {
+
+        }else {//이미지 따로 설정안해서 값이 null 인 경우
             detailProfileImage.setImageResource(R.drawable.user_default_image);
             detailProfileImage.setColorFilter(MainActivity.mainColor);
         }
@@ -234,9 +247,29 @@ public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBac
         pTextView.setText(string);
     }
 
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+        return dialog;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout((int) (MainActivity.deviceWidth * 0.95), ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+    }
 
     @Override
     public void onBack() {
-        ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+        dismiss();
     }
+
+
 }

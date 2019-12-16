@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.user.moviediary.fragment.FrgMovieHome;
 import com.example.user.moviediary.fragment.FrgMovieSearch;
@@ -35,12 +34,11 @@ public class MainActivity extends AppCompatActivity {
     public static int deviceWidth;
     public static boolean isPressedTheme;
 
-    private long backbtnTime = 0l;
     private DbOpenHelper dbOpenHelper;
     private BottomNavigationView bottomMenu;
 
     // 뒤로가기 버튼 입력시간이 담길 long 객체
-    private long pressedTime = 0;
+    private long backbtnTime = 0l;
     // 뒤로가기 버튼 리스너 객체 생성
     private OnBackPressedListener mBackListener;
 
@@ -143,24 +141,14 @@ public class MainActivity extends AppCompatActivity {
             // 리스너가 설정되지 않은 상태(예를들어 메인Fragment)라면
             // 뒤로가기 버튼을 연속적으로 두번 눌렀을 때 앱이 종료됩니다.
         } else {
-            Log.e("!!!", "Listener is null");
-            if ( pressedTime == 0 ) {
-                Toast.makeText(getApplicationContext(), " 한 번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
-                pressedTime = System.currentTimeMillis();
-            }
-            else {
-                int seconds = (int) (System.currentTimeMillis() - pressedTime);
+            long currentTime = System.currentTimeMillis();
+            long getTime = currentTime - backbtnTime;
 
-                if ( seconds > 600 ) {
-                    Toast.makeText(getApplicationContext(), " 한 번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
-                    pressedTime = 0 ;
-                }
-                else {
-                    super.onBackPressed();
-                    Log.e("!!!", "onBackPressed : finish, killProcess");
-                    finish();
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                }
+            if (getTime >= 0 && getTime < 500) {
+                finish();
+            } else {
+                backbtnTime = currentTime;
+                super.onBackPressed();
             }
         }
     }
