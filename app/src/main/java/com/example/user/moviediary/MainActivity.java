@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 뒤로가기 버튼 입력시간이 담길 long 객체
     private long backbtnTime = 0l;
-    // 뒤로가기 버튼 리스너 객체 생성
-    private OnBackPressedListener mBackListener;
 
     ThemeColors themeColors;
 
@@ -117,39 +115,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public interface OnBackPressedListener {
-        public void onBack();
-    }
-
-    // 리스너 설정 메소드
-    public void setOnBackPressedListener(OnBackPressedListener listener) {
-        mBackListener = listener;
-    }
-
     @Override
     public void onBackPressed() {
         //테마를 바꾸면 isPressedTheme = true 가 되는데 앱을 완전종료하지 않는이상 이 값이 변하지 않으므로
         //뒤로가기버튼을 누르면 수시로 false 가 되게 함
-
         if (isPressedTheme == true)
             isPressedTheme = false;
 
-        // 다른 Fragment 에서 리스너를 설정했을 때 처리됩니다.
-        if(mBackListener != null) {
-            mBackListener.onBack();
-            Log.e("!!!", "Listener is not null");
-            // 리스너가 설정되지 않은 상태(예를들어 메인Fragment)라면
-            // 뒤로가기 버튼을 연속적으로 두번 눌렀을 때 앱이 종료됩니다.
-        } else {
-            long currentTime = System.currentTimeMillis();
-            long getTime = currentTime - backbtnTime;
+        long currentTime = System.currentTimeMillis();
+        long getTime = currentTime - backbtnTime;
 
-            if (getTime >= 0 && getTime < 500) {
-                finish();
-            } else {
-                backbtnTime = currentTime;
-                super.onBackPressed();
-            }
+        if (getTime >= 0 && getTime < 500) {
+            finish();
+        } else {
+            super.onBackPressed();
+            backbtnTime = currentTime;
         }
     }
 

@@ -20,19 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -51,7 +46,7 @@ import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FrgMovieDiaryDetails extends DialogFragment implements MainActivity.OnBackPressedListener {
+public class FrgMovieDiaryDetails extends DialogFragment{
     private CircleImageView detailProfileImage;
     private TextView detailName;
     private ImageButton ibOption;
@@ -87,7 +82,6 @@ public class FrgMovieDiaryDetails extends DialogFragment implements MainActivity
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        ((MainActivity) context).setOnBackPressedListener(this);
     }
 
     @Nullable
@@ -264,11 +258,6 @@ public class FrgMovieDiaryDetails extends DialogFragment implements MainActivity
             dialog.getWindow().setLayout((int) (MainActivity.deviceWidth * 0.95), ViewGroup.LayoutParams.MATCH_PARENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
-    }
-
-    @Override
-    public void onBack() {
-        dismiss();
     }
 
 
