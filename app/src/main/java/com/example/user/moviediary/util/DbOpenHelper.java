@@ -119,7 +119,7 @@ public class DbOpenHelper {
     }
 
     public Cursor selectPostingColumns() {
-        return mDB.query(DiaryDB.CreatePosting.POSTING_TBL, null, null, null, null, null, null);
+        return mDB.query(DiaryDB.CreatePosting.POSTING_TBL, null, null, null, null, null, DiaryDB.CreatePosting.MV_DATE);
     }
 
     public boolean updatePostingColumn(int mv_id, String title, String poster, String mv_date, String post_date

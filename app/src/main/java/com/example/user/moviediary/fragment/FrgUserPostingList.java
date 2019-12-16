@@ -43,7 +43,7 @@ public class FrgUserPostingList extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        insertList();
+        insertList("posting_tbl","post_date DESC, mv_date DESC");
 
         adapter = new MovieDiaryAdapter(R.layout.item_user, list);
         Log.d("ViewPager", "postlist size = "+list.size());
@@ -53,13 +53,11 @@ public class FrgUserPostingList extends Fragment {
 
     }
 
-    private void insertList() {
-
+    private void insertList(String tbl_name, String sort) {
         list.clear();
         dbOpenHelper = new DbOpenHelper(getContext());
         dbOpenHelper.openPosting();
-        dbOpenHelper.createPostingHelper();
-        Cursor cursor = dbOpenHelper.selectPostingColumns();
+        Cursor cursor = dbOpenHelper.sortColumn(tbl_name,sort);
 
         while (cursor.moveToNext()) {
             int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));

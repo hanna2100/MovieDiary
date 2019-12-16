@@ -46,9 +46,11 @@ public final class DiaryDB {
         public static final String TITLE = "title";
         public static final String MV_ID = "mv_id";
         public static final String MV_POSTER = "mv_poster";
+        public static final String NO = "no";
         public static final String CREATE_LIKE = "create table if not exists "
-                +LIKE_TBL+"("
-                +MV_ID+" integer primary key, "
+                +LIKE_TBL+" ("
+                +NO+" integer primary key AUTOINCREMENT, "
+                +MV_ID+" integer, "
                 +TITLE+" text not null, "
                 +MV_POSTER+" text );";
     }
