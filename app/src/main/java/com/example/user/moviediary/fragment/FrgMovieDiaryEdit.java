@@ -25,7 +25,8 @@ import com.example.user.moviediary.util.GlideApp;
 
 import java.util.Calendar;
 
-public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener, View.OnTouchListener {
+public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener  {
+
     private Button btnEditCancel;
     private Button btnEditSave;
     private ImageView detailPosterImage;
@@ -84,14 +85,13 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener,
         GlideApp.with(mContext).load(imageSource).fitCenter().into(detailPosterImage);
         detailRatingBar.setRating(star);
         detailDate.setText(date);
-        detailContent.setText(title + "  " + content);
+        detailContent.setText(content);
 
         detailContent.setEnabled(true);
 
         detailDate.setOnClickListener(this);
         btnEditCancel.setOnClickListener(this);
         btnEditSave.setOnClickListener(this);
-        detailContent.setOnTouchListener(this);
 
         return view;
     }
@@ -138,10 +138,5 @@ public class FrgMovieDiaryEdit extends Fragment implements View.OnClickListener,
         }
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        detailPosterImage.setVisibility(View.GONE);
-        return false;
-    }
 }
 

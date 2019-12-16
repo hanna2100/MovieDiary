@@ -1,11 +1,8 @@
 package com.example.user.moviediary.fragment;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,18 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -43,11 +35,12 @@ import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FrgMovieDiaryDetails extends Fragment {
+public class FrgMovieDiaryDetails extends Fragment implements MainActivity.OnBackPressedListener {
+
     private CircleImageView detailProfileImage;
     private TextView detailName;
     private ImageButton ibOption;
@@ -83,6 +76,7 @@ public class FrgMovieDiaryDetails extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+        ((MainActivity) context).setOnBackPressedListener(this);
     }
 
     @Nullable
@@ -99,7 +93,7 @@ public class FrgMovieDiaryDetails extends Fragment {
 
         // 프로필 이미지, 이름 설정
         setupProfile();
-        
+
         dbOpenHelper = new DbOpenHelper(mContext);
 
         mv_id = getArguments().getInt("mv_id");
@@ -124,8 +118,9 @@ public class FrgMovieDiaryDetails extends Fragment {
         detailRatingBar.setRating(star);
         detailDate.setText(date);
 
-        detailContent.setText(title+ "  "+content);
+        detailContent.setText(content);
 
+        //해시태그 이벤트
         setTags(detailContent, detailContent.getText().toString());
 
         ibOption.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +183,11 @@ public class FrgMovieDiaryDetails extends Fragment {
 
     private void setupProfile() {
         detailName.setText(UserData.userName);
+        // 카카오로그인이면 다이어리 상세페이지에 그냥 글라이드앱으로 프로필 이미지 세팅해줘용
+//        if (UserData.kakaoLogin != 0) {
+//            GlideApp.with(mContext).load(UserData.profileImgPath).into(detailProfileImage);
+//        }
+
         if (UserData.profileImgPath != null)
             detailProfileImage.setImageURI(Uri.parse(UserData.profileImgPath));
         else {
@@ -199,7 +199,6 @@ public class FrgMovieDiaryDetails extends Fragment {
     // 목록에서 한 게시물을 클릭했을때 #이 붙은 해시태그가 있으면 색깔 변하게 해주고, 그 해시태그 클릭이벤트 해줘!
     private void setTags(TextView pTextView, String pTagString) {
         SpannableString string = new SpannableString(pTagString);
-
         int start = -1;
         for (int i = 0; i < pTagString.length(); i++) {
             if (pTagString.charAt(i) == '#') {
@@ -236,4 +235,8 @@ public class FrgMovieDiaryDetails extends Fragment {
     }
 
 
+    @Override
+    public void onBack() {
+        ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+    }
 }

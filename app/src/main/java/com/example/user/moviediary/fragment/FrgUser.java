@@ -109,6 +109,8 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         view = inflater.inflate(R.layout.fragment_user, container, false);
         new ThemeColors(mContext);
 
+        view.setTag("FrgUser");
+
         mainLayout = view.findViewById(R.id.mainLayout);
         drawerLayout = view.findViewById(R.id.drawerLayout);
         ibSetting = view.findViewById(R.id.ibSetting);
