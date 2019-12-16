@@ -344,7 +344,6 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
             recyclerView.setAdapter(adapter);
             ViewCompat.setNestedScrollingEnabled(recyclerView,false);
 
-
             //프로그레스바 제거
             progressDialog.dismiss();
             layoutView.setVisibility(View.VISIBLE);

@@ -222,6 +222,7 @@ public class FrgMovieDiaryDetails extends DialogFragment{
 
                         @Override
                         public void onClick(View widget) {
+                            dismiss();
                             ((MainActivity) getContext()).setChangeFragment(FrgHashtag.newInstance(tag));
                         }
 
