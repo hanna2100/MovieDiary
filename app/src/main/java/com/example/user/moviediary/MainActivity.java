@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String NAME = "ThemeColors", KEY = "color";
     private static final String USER = "User", INIT = "init";
+    private static final String IS_CHANGE_PROFILE = "isChangeProfile";
+
     public static int mainColor;
     public static int deviceWidth;
     public static boolean isPressedTheme;
@@ -79,7 +81,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
 
         } else if (isInitialized == true && isPressedTheme == false) {
-            setChangeFragment(FrgMovieHome.newInstance());
+            Intent intent = getIntent();
+            boolean flag = intent.getBooleanExtra(IS_CHANGE_PROFILE, false);
+            if (flag == false)
+                setChangeFragment(FrgMovieHome.newInstance());
+            else
+                setChangeFragment(FrgUser.newInstance());
             setupUserProfile();
         }
 

@@ -12,7 +12,7 @@
     <!-- 설정 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
         android:orientation="vertical">
 
         <TextView
@@ -20,7 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_marginTop="20dp"
             android:text="Setting"
             android:textSize="40dp" />
 
@@ -30,7 +29,7 @@
     <!-- 테마 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:background="#16FFFFFF"
         android:orientation="horizontal">
 
@@ -46,7 +45,7 @@
             android:text="테마"
             android:textStyle="bold"
             android:textColor="#020F66"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -54,7 +53,7 @@
     <!-- 테마변경 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -71,7 +70,7 @@
             android:gravity="center_vertical"
             android:text="테마변경"
             android:textColor="#000000"
-            android:textSize="17sp" />
+            android:textSize="15sp" />
 
 
     </LinearLayout>
@@ -80,7 +79,7 @@
     <!-- 검색설정 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:background="#16FFFFFF"
         android:orientation="horizontal">
 
@@ -104,7 +103,7 @@
     <!-- 검색설정 변경 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:background="#1D7E5959">
 
@@ -131,13 +130,13 @@
                     android:gravity="center_vertical"
                     android:text="성인영화 포함"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="15sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="(카카오톡 로그인으로 성인인증 시 사용가능)"
                     android:textColor="#585858"
-                    android:textSize="10sp"/>
+                    android:textSize="9sp"/>
             </LinearLayout>
 
             <Switch
@@ -156,11 +155,79 @@
 
     </LinearLayout>
 
+    <!-- 백업 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="#16FFFFFF"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:text="백업"
+            android:textStyle="bold"
+            android:textColor="#020F66"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:background="#1D7E5959"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/btnBackupSend"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#1D7E5959"
+            android:gravity="center_vertical"
+            android:text="백업 하기"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:background="#1D7E5959"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/btnBackupGet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#1D7E5959"
+            android:gravity="center_vertical"
+            android:text="백업 받기"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+    </LinearLayout>
 
     <!-- 문의/의견 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:background="#16FFFFFF"
         android:orientation="horizontal">
 
@@ -176,7 +243,7 @@
             android:text="문의/의견"
             android:textStyle="bold"
             android:textColor="#020F66"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -184,7 +251,7 @@
     <!-- 메일 보내기 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -201,7 +268,7 @@
             android:gravity="center_vertical"
             android:text="메일 보내기"
             android:textColor="#000000"
-            android:textSize="17sp" />
+            android:textSize="15sp" />
 
 
     </LinearLayout>
@@ -210,7 +277,7 @@
     <!-- 어플리케이션 정보 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:background="#16FFFFFF"
         android:orientation="horizontal">
 
@@ -226,7 +293,7 @@
             android:text="어플리케이션정보"
             android:textColor="#020F66"
             android:textStyle="bold"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -234,7 +301,7 @@
     <!-- 버전정보 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -250,7 +317,7 @@
             android:gravity="center_vertical"
             android:text="Movie Diary ver.1.0.0"
             android:textColor="#000000"
-            android:textSize="17sp" />
+            android:textSize="15sp" />
 
     </LinearLayout>
 

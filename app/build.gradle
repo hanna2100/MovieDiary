@@ -35,8 +35,10 @@ dependencies {
     implementation 'com.yarolegovich:discrete-scrollview:1.4.9'
     implementation 'jp.wasabeef:glide-transformations:4.1.0@aar'
     implementation files('libs/YouTubeAndroidPlayerApi.jar')
-    /*카카오로그인*/
+    //카카오로그인
     implementation 'com.kakao.sdk:usermgmt:1.17.0'
+    //서버로 json 주고받기
+    implementation 'com.android.volley:volley:1.1.1'
 
     //김하늘
     implementation 'de.hdodenhof:circleimageview:3.0.0'
