@@ -141,8 +141,8 @@ public class DbOpenHelper {
 
     }
 
-    public Cursor searchPostingColumn(String tag) {
-        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE content LIKE '%" + tag + "%';", null);
+    public Cursor searchPostingColumn(String columnName, String str) {
+        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE " + columnName + " LIKE '%" + str + "%';", null);
         return c;
     }
 

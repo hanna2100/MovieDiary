@@ -30,7 +30,11 @@
         //처음로그인할때 뜨는 액티비티
         <activity android:name=".UserJoinActivity">
         </activity>
-
+        //프로필 수정 액티비티
+        <activity
+            android:name=".ProfileEdit"
+            android:label="프로필 수정 액티비티">
+        </activity>
         //김하늘 사진권한요청
         <provider
             android:name="android.support.v4.content.FileProvider"

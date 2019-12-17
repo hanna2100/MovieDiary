@@ -46,7 +46,7 @@ import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FrgMovieDiaryDetails extends DialogFragment{
+public class FrgMovieDiaryDetails extends DialogFragment {
     private CircleImageView detailProfileImage;
     private TextView detailName;
     private ImageButton ibOption;
@@ -121,9 +121,11 @@ public class FrgMovieDiaryDetails extends DialogFragment{
         detailPosterImage.setLayoutParams(layoutParams);
         GlideApp.with(mContext).load(imageSource).centerCrop().into(detailPosterImage);
 
+        content = content.replace("  "," ");
+
         detailRatingBar.setRating(star);
         detailDate.setText(date);
-        detailContent.setText(content);
+        detailContent.setText(content + " ");
 
         //해시태그 이벤트
         setTags(detailContent, detailContent.getText().toString());
@@ -145,7 +147,7 @@ public class FrgMovieDiaryDetails extends DialogFragment{
                         // 다이어리 수정 프래그먼트 콜해줌
                         //((MainActivity) mContext).setChangeFragment(FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
                         FrgMovieDiaryEdit dialog = (FrgMovieDiaryEdit.newInstance(mv_id, imageSource, title, star, date, content));
-                        dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
+                        dialog.show(((MainActivity) mContext).getSupportFragmentManager(), null);
                         dismiss();
                     }
                 });
@@ -197,7 +199,7 @@ public class FrgMovieDiaryDetails extends DialogFragment{
             }
             detailProfileImage.setImageURI(Uri.parse(UserData.profileImgPath));
 
-        }else {//이미지 따로 설정안해서 값이 null 인 경우
+        } else {//이미지 따로 설정안해서 값이 null 인 경우
             detailProfileImage.setImageResource(R.drawable.user_default_image);
             detailProfileImage.setColorFilter(MainActivity.mainColor);
         }
@@ -210,7 +212,7 @@ public class FrgMovieDiaryDetails extends DialogFragment{
         for (int i = 0; i < pTagString.length(); i++) {
             if (pTagString.charAt(i) == '#') {
                 start = i;
-            } else if (pTagString.charAt(i) == ' ' || (i == pTagString.length() - 1 && start != -1)) {
+            } else if (pTagString.charAt(i) == ' ' || pTagString.charAt(i) == '#' || pTagString.charAt(i) == '\n' || (i == pTagString.length() - 1 && start != -1)) {
                 if (start != -1) {
                     if (i == pTagString.length() - 1) {
                         i++; // case for if hash is last word and there is no

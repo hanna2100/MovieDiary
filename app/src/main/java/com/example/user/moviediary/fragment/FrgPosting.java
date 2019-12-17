@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,7 +148,7 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                     }
                 }, y, m, d); // 기본값 연월일
                 // 날짜 입력 제한. 오늘 이후의 날짜는 선택할 수 없게한다.
-                calendar.set(y,m,d);
+                calendar.set(y, m, d);
                 dpd.getDatePicker().setMaxDate(calendar.getTimeInMillis());
                 dpd.show();
                 break;
@@ -188,12 +189,18 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 int post_date_d = post_date.get(Calendar.DAY_OF_MONTH);
 
                 String postDate = post_date_y + "-" + (post_date_m + 1) + "-" + post_date_d;
+
+
+                String edtReviewCheck = edtReview.getText().toString();
+                edtReviewCheck = edtReviewCheck.replace("\n"," \n");
+                edtReviewCheck = edtReviewCheck.replace("#"," #");
+
                 // DB에 넣어준다
                 dbOpenHelper.openPosting();
                 dbOpenHelper.createPostingHelper();
                 dbOpenHelper.insertPostingColumn(movie_id, postingTitle.getText().toString().trim(),
                         posterPath, postingDate.getText().toString().trim(),
-                        postDate, postingRatingBar.getRating(), edtReview.getText().toString().trim()+" ");
+                        postDate, postingRatingBar.getRating(), edtReviewCheck+" ");
                 // DB확인. 나중에 지워줭
                 showDatabase("posting_tbl", "mv_id");
 

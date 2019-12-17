@@ -117,6 +117,7 @@
         android:layout_marginBottom="10dp"
         android:layout_weight="1"
         android:background="#FFFFFF"
+        android:hint=" 리뷰를 입력해주세요."
         android:inputType="textMultiLine" />
 
     <LinearLayout

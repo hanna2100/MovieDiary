@@ -1,6 +1,7 @@
-package com.example.user.moviediary.fragment;
+package com.example.user.moviediary;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,22 +14,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.user.moviediary.MainActivity;
-import com.example.user.moviediary.R;
+import com.example.user.moviediary.fragment.FrgUser;
 import com.example.user.moviediary.model.UserData;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.gun0912.tedpermission.PermissionListener;
@@ -45,11 +44,7 @@ import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.app.Activity.RESULT_CANCELED;
-
-public class FrgUserProfileEdit extends Fragment implements View.OnClickListener {
-    private Context mContext;
-    private View view;
+public class ProfileEdit extends AppCompatActivity implements View.OnClickListener {
 
     private CircleImageView profileImage;
     private Button btnEditProfileImage, btnEditCancel, btnEditSave;
@@ -64,35 +59,24 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
     private static final int PICK_FROM_CAMERA = 2;
     private static final int PICK_FROM_ALBUM = 1;
 
+    private static final String IS_CHANGE_PROFILE = "isChangeProfile";
+
     //Shared Preference 키값
     private static final String USER = "User", INIT = "init";
 
-    public static FrgUserProfileEdit newInstance() {
-        FrgUserProfileEdit fragment = new FrgUserProfileEdit();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mContext = context;
-    }
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user_profile);
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.activity_user_profile, container, false);
+        Intent intent = getIntent();
 
-        profileImage = view.findViewById(R.id.profileImage);
-
-        btnEditProfileImage = view.findViewById(R.id.btnEditProfileImage);
-        btnEditCancel = view.findViewById(R.id.btnEditCancel);
-        btnEditSave = view.findViewById(R.id.btnEditSave);
-
-        txtName = view.findViewById(R.id.txtName);
-        txtDescription = view.findViewById(R.id.txtDescription);
+        profileImage = findViewById(R.id.profileImage);
+        btnEditProfileImage = findViewById(R.id.btnEditProfileImage);
+        btnEditCancel = findViewById(R.id.btnEditCancel);
+        btnEditSave = findViewById(R.id.btnEditSave);
+        txtName = findViewById(R.id.txtName);
+        txtDescription = findViewById(R.id.txtDescription);
 
         // 초기 세팅
         setupProfile();
@@ -100,18 +84,18 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
         txtName.setEnabled(false);
 
         //액션바 숨기기
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        getSupportActionBar().hide();
 
-        TedPermission.with(mContext)
+        TedPermission.with(getApplicationContext())
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        Toast.makeText(mContext, "카메라 권한 요청 허용되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "카메라 권한 요청 허용되었습니다.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                        Toast.makeText(mContext, "카메라 권한 요청 거절되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "카메라 권한 요청 거절되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setRationaleMessage("카메라 권한 허용 요청")
@@ -126,7 +110,6 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
         btnEditCancel.setOnClickListener(this);
         btnEditSave.setOnClickListener(this);
 
-        return view;
     }
 
     private void setupProfile() {
@@ -138,14 +121,13 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
             profileImage.setImageResource(R.drawable.user_default_image);
             profileImage.setColorFilter(MainActivity.mainColor);
         }
-
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnEditProfileImage:
-                final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(mContext);
+                final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProfileEdit.this);
                 bottomSheetDialog.setContentView(R.layout.user_profile_image_dialog);
                 Button btnPofileImageDelete = bottomSheetDialog.findViewById(R.id.btnPofileImageDelete);
                 Button btnPofileImageCameraOn = bottomSheetDialog.findViewById(R.id.btnPofileImageCameraOn);
@@ -166,7 +148,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                         try {
                             tempFile = createImageFile();
                         } catch (IOException e) {
-                            Toast.makeText(mContext, "이미지 처리 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "이미지 처리 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
                             bottomSheetDialog.dismiss();
                             e.printStackTrace();
                         }
@@ -174,7 +156,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
 
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 
-                                Uri photoUri = FileProvider.getUriForFile(mContext,
+                                Uri photoUri = FileProvider.getUriForFile(getApplicationContext(),
                                         "com.example.user.moviediary.fragment.provider", tempFile);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                                 startActivityForResult(intent, PICK_FROM_CAMERA);
@@ -202,7 +184,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                 bottomSheetDialog.show();
                 break;
             case R.id.btnEditCancel:
-                ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                onBackPressed();
                 break;
             case R.id.btnEditSave:
                 String description = txtDescription.getText().toString().trim();
@@ -213,7 +195,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                     Log.d("User_check", name + ", " + description + ", " + profileImgPath);
 
                     //디비에 저장
-                    dbOpenHelper = new DbOpenHelper(getContext());
+                    dbOpenHelper = new DbOpenHelper(getApplicationContext());
                     dbOpenHelper.openUser();
                     dbOpenHelper.updateUserColumn(name, profileImgPath, description, 0);
 //                    dbOpenHelper.upgradeUserHelper();
@@ -223,14 +205,16 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
 
 
                     //프로필 설정 완료했음을 저장
-                    SharedPreferences.Editor editor = mContext.getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
+                    SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
                     editor.putBoolean(INIT, true);
                     editor.apply();
 
-                    ((MainActivity) mContext).setupUserProfile();
-                    ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                    Intent intent = new Intent(ProfileEdit.this,MainActivity.class);
+                    intent.putExtra(IS_CHANGE_PROFILE,true);
+                    startActivity(intent);
+
                 } else {
-                    Toast.makeText(mContext, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -274,7 +258,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                     String[] proj = {MediaStore.Images.Media.DATA};
 
                     assert photoUri != null;
-                    cursor = mContext.getContentResolver().query(photoUri, proj, null, null, null);
+                    cursor = getApplicationContext().getContentResolver().query(photoUri, proj, null, null, null);
 
                     assert cursor != null;
                     int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -313,7 +297,7 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                             BitmapFactory.Options options = new BitmapFactory.Options();
                             final Bitmap originalBm = BitmapFactory.decodeFile(copyFile.getAbsolutePath(), options);
 
-                            ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                            ProfileEdit.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     profileImage.setImageBitmap(originalBm);
@@ -374,12 +358,12 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
                     break;
                 }
                 fileList[i].delete();
-                Toast.makeText(mContext, "파일삭제해씀", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "파일삭제해씀", Toast.LENGTH_SHORT).show();
             }
             //storageDir.delete();
         } else if (!storageDir.exists()) {
             storageDir.mkdirs();
-            Toast.makeText(mContext, "디렉토리만들겨", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "디렉토리만들겨", Toast.LENGTH_SHORT).show();
         }
 
         // 빈 파일 생성
@@ -388,5 +372,16 @@ public class FrgUserProfileEdit extends Fragment implements View.OnClickListener
         profileImgPath = image.getAbsolutePath();
 
         return image;
+    }
+
+    public void setChangeFragment(Fragment fragment) {
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_right);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
+
+        return;
     }
 }

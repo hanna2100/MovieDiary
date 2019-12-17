@@ -10,31 +10,34 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.adapter.MovieHashtagAdapter;
+import com.example.user.moviediary.adapter.MoviePostingSearchAdapter;
 import com.example.user.moviediary.model.MovieDiary;
 import com.example.user.moviediary.util.DbOpenHelper;
 
 import java.util.ArrayList;
 
-public class FrgHashtag extends Fragment {
+public class FrgPostingSearch extends Fragment implements TextView.OnEditorActionListener {
     private ArrayList<MovieDiary> list = new ArrayList<>();
     private Context mContext;
     private Activity mActivity;
     private View view;
 
-    private MovieHashtagAdapter adapter;
+    private MoviePostingSearchAdapter adapter;
 
     private DbOpenHelper dbOpenHelper;
-    private RecyclerView rcvHashtag;
-    private EditText edtHashTag;
+    private RecyclerView rcvPostingSearch;
+    private EditText edtPostingSearch;
 
-    private String tag;
+    private String title;
 
     int tempMvId;
     String tempTitle;
@@ -44,11 +47,11 @@ public class FrgHashtag extends Fragment {
     float tempStar;
     String tempContent;
 
-    public static FrgHashtag newInstance(String tag) {
-        FrgHashtag fragment = new FrgHashtag();
+    public static FrgPostingSearch newInstance(String title) {
+        FrgPostingSearch fragment = new FrgPostingSearch();
         Bundle args = new Bundle();
 
-        args.putString("tag", tag);
+        args.putString("title", title);
 
         fragment.setArguments(args);
         return fragment;
@@ -66,35 +69,33 @@ public class FrgHashtag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_hashtag, container, false);
+        view = inflater.inflate(R.layout.fragment_posting_search, container, false);
 
-        edtHashTag = view.findViewById(R.id.edtHashTag);
-        rcvHashtag = view.findViewById(R.id.rcvHashtag);
+        edtPostingSearch = view.findViewById(R.id.edtPostingSearch);
+        rcvPostingSearch = view.findViewById(R.id.rcvPostingSearch);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 3);
-        rcvHashtag.setLayoutManager(gridLayoutManager);
+        rcvPostingSearch.setLayoutManager(gridLayoutManager);
 
-        tag = getArguments().getString("tag");
+        title = getArguments().getString("title");
 
-        insertList();
+        insertList(title);
 
-        edtHashTag.setText(tag);
-        adapter = new MovieHashtagAdapter(R.layout.item_user, list);
-        rcvHashtag.setAdapter(adapter);
+        edtPostingSearch.setOnEditorActionListener(this);
+
+        edtPostingSearch.setText(title);
+        adapter = new MoviePostingSearchAdapter(R.layout.item_user, list);
+        rcvPostingSearch.setAdapter(adapter);
 
         return view;
     }
 
-    private void insertList() {
+    private void insertList(String title) {
         list.clear();
         dbOpenHelper = new DbOpenHelper(getContext());
         dbOpenHelper.openPosting();
-        dbOpenHelper.createPostingHelper();
-
-        Cursor cursor = dbOpenHelper.searchPostingColumn("content",tag+" ");
-
-        Log.d("TAG", tag);
-
+        Cursor cursor = dbOpenHelper.searchPostingColumn("title",title);
         while (cursor.moveToNext()) {
+
             tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
             tempTitle = cursor.getString(cursor.getColumnIndex("title"));
             tempPoster = cursor.getString(cursor.getColumnIndex("mv_poster"));
@@ -106,8 +107,19 @@ public class FrgHashtag extends Fragment {
             list.add(new MovieDiary(tempMvId,tempPoster,tempTitle,tempStar,tempMovieDate,tempContent));
         }
 
-        Log.d("TAG", String.valueOf(list.size()));
+        Log.d("SIZE_CHECK",String.valueOf(list.size()));
 
         dbOpenHelper.close();
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        String searchMovieTitle = edtPostingSearch.getText().toString().trim();
+        insertList(searchMovieTitle);
+
+        edtPostingSearch.setText(searchMovieTitle);
+        adapter = new MoviePostingSearchAdapter(R.layout.item_user, list);
+        rcvPostingSearch.setAdapter(adapter);
+        return false;
     }
 }

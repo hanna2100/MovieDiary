@@ -143,16 +143,18 @@ public class FrgMovieDiaryEdit extends DialogFragment implements View.OnClickLis
                 float editStar = detailRatingBar.getRating();
                 String editContent = detailContent.getText().toString();
 
+                editContent = editContent.replace("\n"," \n");
+                editContent = editContent.replace("#"," #");
+
+
                 dbOpenHelper.openPosting();
-                dbOpenHelper.updatePostingColumn(mv_id,title,imageSource,editDate,editPostDate,editStar,editContent);
+                dbOpenHelper.updatePostingColumn(mv_id,title,imageSource,editDate,editPostDate,editStar,editContent+" ");
                 dbOpenHelper.close();
 
                 Toast.makeText(mContext,"다이어리가 수정되었습니다.",Toast.LENGTH_SHORT).show();
                 FrgMovieDiaryDetails dialog = (FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
                 dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
                 dismiss();
-//                ((MainActivity) mContext)
-//                        .setChangeFragment(FrgMovieDiaryDetails.newInstance(mv_id, imageSource, title, editStar, editDate, editContent));
 
                 break;
         }
