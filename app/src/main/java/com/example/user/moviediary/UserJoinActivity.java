@@ -148,7 +148,7 @@ public class UserJoinActivity extends AppCompatActivity implements View.OnClickL
                     editor.putBoolean(INIT, true);
                     editor.apply();
 
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    Intent intent = new Intent(UserJoinActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 }

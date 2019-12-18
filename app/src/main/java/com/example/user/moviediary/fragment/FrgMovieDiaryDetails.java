@@ -173,6 +173,7 @@ public class FrgMovieDiaryDetails extends DialogFragment {
                         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                dbOpenHelper.close();
                                 Toast.makeText(getContext(), "취소되었습니다..", Toast.LENGTH_SHORT).show();
                                 bottomSheetDialog.dismiss();
                             }

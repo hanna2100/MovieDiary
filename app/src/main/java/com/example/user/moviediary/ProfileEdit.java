@@ -3,6 +3,7 @@ package com.example.user.moviediary;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,22 +17,39 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.user.moviediary.fragment.FrgUser;
 import com.example.user.moviediary.model.UserData;
 import com.example.user.moviediary.util.DbOpenHelper;
+import com.example.user.moviediary.util.GlideApp;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.kakao.auth.ApiErrorCode;
+import com.kakao.auth.ApiResponseCallback;
+import com.kakao.auth.AuthService;
+import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
+import com.kakao.auth.network.response.AccessTokenInfoResponse;
+import com.kakao.kakaotalk.KakaoTalkService;
+import com.kakao.kakaotalk.api.KakaoTalkApi;
+import com.kakao.kakaotalk.callback.TalkResponseCallback;
+import com.kakao.kakaotalk.response.KakaoTalkProfile;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.LoginButton;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.exception.KakaoException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +65,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileEdit extends AppCompatActivity implements View.OnClickListener {
 
     private CircleImageView profileImage;
+    private ImageButton ibKakaoLogin;
     private Button btnEditProfileImage, btnEditCancel, btnEditSave;
     private EditText txtName, txtDescription;
 
@@ -55,21 +74,23 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
     private String profileImgPath;
 
     private DbOpenHelper dbOpenHelper;
+
     // 리퀘스트코드
     private static final int PICK_FROM_CAMERA = 2;
     private static final int PICK_FROM_ALBUM = 1;
 
     private static final String IS_CHANGE_PROFILE = "isChangeProfile";
 
-    //Shared Preference 키값
-    private static final String USER = "User", INIT = "init";
+    //카카오 로그인
+    SessionCallback callback;
+    LoginButton loginKakaoReal;
+    FrameLayout flLoginMain;
+    LinearLayout llLoginMain;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-
-        Intent intent = getIntent();
 
         profileImage = findViewById(R.id.profileImage);
         btnEditProfileImage = findViewById(R.id.btnEditProfileImage);
@@ -77,6 +98,8 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
         btnEditSave = findViewById(R.id.btnEditSave);
         txtName = findViewById(R.id.txtName);
         txtDescription = findViewById(R.id.txtDescription);
+        ibKakaoLogin = findViewById(R.id.ibKakaoLogin);
+        loginKakaoReal = findViewById(R.id.loginKakaoReal);
 
         // 초기 세팅
         setupProfile();
@@ -90,12 +113,12 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        Toast.makeText(getApplicationContext(), "카메라 권한 요청 허용되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileEdit.this, "카메라 권한 요청 허용되었습니다.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                        Toast.makeText(getApplicationContext(), "카메라 권한 요청 거절되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileEdit.this, "카메라 권한 요청 거절되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setRationaleMessage("카메라 권한 허용 요청")
@@ -109,17 +132,25 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
         btnEditProfileImage.setOnClickListener(this);
         btnEditCancel.setOnClickListener(this);
         btnEditSave.setOnClickListener(this);
+        ibKakaoLogin.setOnClickListener(this);
 
     }
 
+    //프로필 뷰 설정
     private void setupProfile() {
+
         txtName.setText(UserData.userName);
         txtDescription.setText(UserData.diaryDescription);
-        if (UserData.profileImgPath != null)
-            profileImage.setImageURI(Uri.parse(UserData.profileImgPath));
-        else {
+        if (UserData.profileImgPath != null) {
+            if (UserData.kakaoLogin == 0) {//카톡로그인아니면서 이미지따로 설정한경우
+                profileImage.setImageURI(Uri.parse(UserData.profileImgPath));
+            } else {//카톡로그인이면서 이미지 따로 있는경우
+                GlideApp.with(this).load(UserData.profileImgPath)
+                        .fitCenter()
+                        .into(profileImage);
+            }
+        }else {
             profileImage.setImageResource(R.drawable.user_default_image);
-            profileImage.setColorFilter(MainActivity.mainColor);
         }
     }
 
@@ -148,7 +179,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                         try {
                             tempFile = createImageFile();
                         } catch (IOException e) {
-                            Toast.makeText(getApplicationContext(), "이미지 처리 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProfileEdit.this, "이미지 처리 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
                             bottomSheetDialog.dismiss();
                             e.printStackTrace();
                         }
@@ -156,7 +187,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
 
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 
-                                Uri photoUri = FileProvider.getUriForFile(getApplicationContext(),
+                                Uri photoUri = FileProvider.getUriForFile(ProfileEdit.this,
                                         "com.example.user.moviediary.fragment.provider", tempFile);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                                 startActivityForResult(intent, PICK_FROM_CAMERA);
@@ -165,7 +196,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
 
                                 Uri photoUri = Uri.fromFile(tempFile);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                                startActivityForResult(intent, PICK_FROM_CAMERA);
+                                (ProfileEdit.this).startActivityForResult(intent, PICK_FROM_CAMERA);
 
                             }
                         }
@@ -177,12 +208,13 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                     public void onClick(View v) {
                         Intent intent = new Intent(Intent.ACTION_PICK);
                         intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-                        startActivityForResult(intent, PICK_FROM_ALBUM);
+                        (ProfileEdit.this).startActivityForResult(intent, PICK_FROM_ALBUM);
                         bottomSheetDialog.dismiss();
                     }
                 });
                 bottomSheetDialog.show();
                 break;
+
             case R.id.btnEditCancel:
                 onBackPressed();
                 break;
@@ -195,39 +227,57 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                     Log.d("User_check", name + ", " + description + ", " + profileImgPath);
 
                     //디비에 저장
-                    dbOpenHelper = new DbOpenHelper(getApplicationContext());
+                    dbOpenHelper = new DbOpenHelper(this);
                     dbOpenHelper.openUser();
-                    dbOpenHelper.updateUserColumn(name, profileImgPath, description, 0);
-//                    dbOpenHelper.upgradeUserHelper();
-//                    dbOpenHelper.createUserHelper();
-//                    dbOpenHelper.insertUserColumn(name, profileImgPath, description, 0);
+                    int kakaoLogin = UserData.kakaoLogin;
+                    dbOpenHelper.updateUserColumn(name, profileImgPath, description, kakaoLogin);
                     dbOpenHelper.close();
 
-
-                    //프로필 설정 완료했음을 저장
-                    SharedPreferences.Editor editor = getApplicationContext().getSharedPreferences(USER, Context.MODE_PRIVATE).edit();
-                    editor.putBoolean(INIT, true);
-                    editor.apply();
-
-                    Intent intent = new Intent(ProfileEdit.this,MainActivity.class);
-                    intent.putExtra(IS_CHANGE_PROFILE,true);
+                    Intent intent = new Intent(ProfileEdit.this, MainActivity.class);
+                    intent.putExtra(IS_CHANGE_PROFILE, true);
                     startActivity(intent);
 
                 } else {
-                    Toast.makeText(getApplicationContext(), "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
                 }
+                break;
+
+            case R.id.ibKakaoLogin:
+                if (UserData.kakaoLogin == 0)//일반 로그인유저면 카카오 연동실행
+                    loginKakaoReal.performClick();
+                else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("카카오톡 로그인")
+                            .setMessage("이미 카카오톡과 연동된 사용자입니다");
+
+                    builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+
                 break;
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //카카오로그인일 경우
+        if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
 
         if (resultCode != RESULT_CANCELED) {
             if (requestCode == PICK_FROM_CAMERA) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 Bitmap originalBm = BitmapFactory.decodeFile(tempFile.getAbsolutePath(), options);
-
+                Log.d("태그", "originalBm="+originalBm);
                 ExifInterface exifInterface = null;
                 // 속성을 체크해야된다.
                 try {
@@ -246,7 +296,9 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                 }
 
                 Bitmap bitmapTemp = rotate(originalBm, exifDegree);
+
                 profileImage.setImageBitmap(bitmapTemp);
+
             } else if (requestCode == PICK_FROM_ALBUM) {
 
                 Uri photoUri = data.getData();
@@ -258,7 +310,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                     String[] proj = {MediaStore.Images.Media.DATA};
 
                     assert photoUri != null;
-                    cursor = getApplicationContext().getContentResolver().query(photoUri, proj, null, null, null);
+                    cursor = getContentResolver().query(photoUri, proj, null, null, null);
 
                     assert cursor != null;
                     int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -297,7 +349,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                             BitmapFactory.Options options = new BitmapFactory.Options();
                             final Bitmap originalBm = BitmapFactory.decodeFile(copyFile.getAbsolutePath(), options);
 
-                            ProfileEdit.this.runOnUiThread(new Runnable() {
+                            runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     profileImage.setImageBitmap(originalBm);
@@ -315,6 +367,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                         cursor.close();
                     }
                 }
+
             }
         }
     }
@@ -358,12 +411,12 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                     break;
                 }
                 fileList[i].delete();
-                Toast.makeText(getApplicationContext(), "파일삭제해씀", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileEdit.this, "파일삭제해씀", Toast.LENGTH_SHORT).show();
             }
             //storageDir.delete();
         } else if (!storageDir.exists()) {
             storageDir.mkdirs();
-            Toast.makeText(getApplicationContext(), "디렉토리만들겨", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ProfileEdit.this, "디렉토리만들겨", Toast.LENGTH_SHORT).show();
         }
 
         // 빈 파일 생성
@@ -374,14 +427,65 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
         return image;
     }
 
-    public void setChangeFragment(Fragment fragment) {
+    private class SessionCallback implements ISessionCallback {
+        @Override
+        public void onSessionOpened() {
+            UserManagement.getInstance().me(new MeV2ResponseCallback() {
+                @Override
+                public void onFailure(ErrorResult errorResult) {
+                    Log.d("카카오", "onFailure");
+                    int result = errorResult.getErrorCode();
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_right);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.replace(R.id.mainFrame, fragment);
-        fragmentTransaction.commit();
+                    if (result == ApiErrorCode.CLIENT_ERROR_CODE) {
+                        Toast.makeText(getApplicationContext(), "네트워크 연결이 불안정합니다. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "로그인 도중 오류가 발생했습니다: " + errorResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-        return;
+                @Override
+                public void onSessionClosed(ErrorResult errorResult) {
+                    Log.d("카카오", "onSessionClosed");
+                    Toast.makeText(getApplicationContext(), "세션이 닫혔습니다. 다시 시도해 주세요: " + errorResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess(MeV2Response result) {
+                    Log.d("카카오", "onSuccess");
+                    String name = result.getNickname();
+                    String profileImgPath = result.getProfileImagePath();
+                    String description = "다이어리 설명을 입력해 보세요.";
+                    int kakaoLogin = 0; //카카오톡 로그인이 아니면 0, 나이정보가 없거나 미성년자면 1, 성인이면2.
+                    //성인여부 검사
+                    String age = String.valueOf(result.getKakaoAccount().getAgeRange());
+                    if (!age.equals("null") && !age.equals("15~19")) {
+                        kakaoLogin = 2;
+                    } else {
+                        kakaoLogin = 1;
+                    }
+
+                    //디비에 저장
+                    DbOpenHelper dbOpenHelper = new DbOpenHelper(ProfileEdit.this);
+                    dbOpenHelper.openUser();
+                    dbOpenHelper.upgradeUserHelper();
+                    dbOpenHelper.createUserHelper();
+                    dbOpenHelper.insertUserColumn(name, profileImgPath, description, kakaoLogin);
+                    dbOpenHelper.close();
+
+                    Intent intent = new Intent(ProfileEdit.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
+
+        @Override
+        public void onSessionOpenFailed(KakaoException e) {
+            Log.d("카카오", "onSessionOpenFailed");
+            Toast.makeText(ProfileEdit.this, "로그인 도중 오류가 발생했습니다. 인터넷 연결을 확인해주세요: " + e.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
+
+
 }
