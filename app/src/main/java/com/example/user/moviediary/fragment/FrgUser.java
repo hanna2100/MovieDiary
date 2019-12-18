@@ -65,8 +65,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+
 import com.example.user.moviediary.ProfileEdit;
 import com.example.user.moviediary.adapter.MovieHashtagAdapter;
 
@@ -82,12 +84,12 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     private DrawerLayout mainLayout;
     private LinearLayout drawerLayout;
-    private Button btnTheme, btnMail, btnLogout, btnBackupSend, btnBackupGet;
+    private Button btnTheme, btnMail, btnLogout, btnBackupSend, btnBackupGet, btnReset;
     private Switch switchAdult;
 
     private ImageButton ibSetting, ibSeach;
     private EditText edtSearch;
-    private TextView txtTitle,diaryCount, wishCount, userName, diaryDesc;
+    private TextView txtTitle, diaryCount, wishCount, userName, diaryDesc;
     private Button btnEditProfile;
     private CircleImageView userImage;
 
@@ -148,6 +150,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         btnLogout = view.findViewById(R.id.btnLogout);
         btnBackupSend = view.findViewById(R.id.btnBackupSend);
         btnBackupGet = view.findViewById(R.id.btnBackupGet);
+        btnReset = view.findViewById(R.id.btnReset);
 
         diaryCount = view.findViewById(R.id.diaryCount);
         wishCount = view.findViewById(R.id.wishCount);
@@ -190,6 +193,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
         drawerLayout.setOnTouchListener(this);
         btnBackupSend.setOnClickListener(this);
         btnBackupGet.setOnClickListener(this);
+        btnReset.setOnClickListener(this);
 
         switchAdult.setOnCheckedChangeListener(this);
         mainLayout.setDrawerListener(listener);
@@ -211,21 +215,21 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 edtSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        Toast.makeText(getContext(),"키워드를 포함한 모든 검색 결과가 나타납니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "키워드를 포함한 모든 검색 결과가 나타납니다.", Toast.LENGTH_SHORT).show();
                         String movieTitle = edtSearch.getText().toString().trim();
-                        Log.d("title",movieTitle);
+                        Log.d("title", movieTitle);
                         ((MainActivity) mActivity).setChangeFragment(FrgPostingSearch.newInstance(movieTitle));
                         return false;
                     }
                 });
-
+                break;
             case R.id.ibSetting:
                 mainLayout.openDrawer(drawerLayout);
                 break;
 
             case R.id.btnEditProfile:
                 // 프로필 수정 창 뜨게 하기
-                Intent intent = new Intent(getContext(),ProfileEdit.class);
+                Intent intent = new Intent(getContext(), ProfileEdit.class);
                 startActivity(intent);
 
                 // ((MainActivity) mContext).setChangeFragment(FrgUserProfileEdit.newInstance());
@@ -255,9 +259,56 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
             case R.id.btnLogout:
                 onClickBtnLogout();
                 break;
+            case R.id.btnReset:
+                // 재확인 다이얼로그 띄워주긔~~~~~~~~~~
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("데이터 초기화").setMessage("모든 데이터가 초기화 됩니다.\n초기화 하시겠습니까?");
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        postingListReset();
+                        likeListReset();
+                        Toast.makeText(mContext,"초기화 되었습니다.",Toast.LENGTH_SHORT).show();
+                        ((MainActivity) mActivity).setChangeFragment(FrgUser.newInstance());
+                    }
+                });
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(mContext,"취소 되었습니다.",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                mainLayout.closeDrawer(drawerLayout);
+                break;
 
         }
     }
+
+    // postingList, likeList 지움
+    private void postingListReset() {
+        dbOpenHelper = new DbOpenHelper(mContext);
+        dbOpenHelper.openPosting();
+        Cursor cursor = dbOpenHelper.selectPostingColumns();
+        while (cursor.moveToNext()) {
+            int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+            dbOpenHelper.deletePostingColumns(tempMvId);
+        }
+        dbOpenHelper.close();
+    }
+
+    private void likeListReset() {
+        dbOpenHelper = new DbOpenHelper(mContext);
+        dbOpenHelper.openLike();
+        Cursor cursor = dbOpenHelper.selectLikeColumns();
+        while (cursor.moveToNext()) {
+            int tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
+            dbOpenHelper.deleteLikeColumns(tempMvId);
+        }
+        dbOpenHelper.close();
+    }
+
 
     private void onClickBtnBackupSend() {
         // 백업 재확인 다이얼로그
@@ -441,7 +492,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
                             dbOpenHelper.insertPostingColumn(id.getAsInt(), title.getAsString()
                                     , poster.getAsString(), movie_date.getAsString()
-                            ,posting_date.getAsString(), star.getAsFloat(), content.getAsString());
+                                    , posting_date.getAsString(), star.getAsFloat(), content.getAsString());
 
                         }
 
@@ -456,7 +507,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ((MainActivity)mContext).setChangeFragment(FrgUser.newInstance());
+                                ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
                                 dialog.cancel();
                             }
                         });
