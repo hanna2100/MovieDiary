@@ -231,7 +231,6 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 // 프로필 수정 창 뜨게 하기
                 Intent intent = new Intent(getContext(), ProfileEdit.class);
                 startActivity(intent);
-
                 // ((MainActivity) mContext).setChangeFragment(FrgUserProfileEdit.newInstance());
                 break;
 
@@ -268,14 +267,14 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                     public void onClick(DialogInterface dialog, int id) {
                         postingListReset();
                         likeListReset();
-                        Toast.makeText(mContext,"초기화 되었습니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "초기화 되었습니다.", Toast.LENGTH_SHORT).show();
                         ((MainActivity) mActivity).setChangeFragment(FrgUser.newInstance());
                     }
                 });
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(mContext,"취소 되었습니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
                 AlertDialog alertDialog = builder.create();
@@ -312,17 +311,20 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     private void onClickBtnBackupSend() {
         // 백업 재확인 다이얼로그
+        View view = View.inflate(getContext(), R.layout.backup_send1, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("백업 하기").setMessage("백업 하시겠습니까?\n다이어리 내용이 서버로 전송됩니다");
+        builder.setView(view);
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 //백업코드 생성
                 final String backupCode = BackupVolley.getRamdomPassword(10);
                 Log.d("백업", "백업코드=" + backupCode);
+                View view2 = View.inflate(getContext(), R.layout.backcup_send2, null);
+                TextView txtBackcupCode = view2.findViewById(R.id.txtBackcupCode);
+                txtBackcupCode.setText(backupCode);
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("백업 코드 생성")
-                        .setMessage(backupCode + "\n백업 코드 입니다\n백업을 받을때 ID로 사용되오니 꼭 기억해주세요\n확인을 누르면 클립보드에 복사됩니다");
+                builder.setView(view2);
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -341,9 +343,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                         dialog.cancel();
                     }
                 });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
+                builder.show();
             }
         });
 
@@ -353,25 +353,19 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 dialog.cancel();
             }
         });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        builder.show();
     }
 
     private void onClickBtnBackupGet() {
+        View view = View.inflate(getContext(), R.layout.backup_down1, null);
+        final EditText edtBackupCode = view.findViewById(R.id.edtBackupCode);
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("백업 받기").setMessage("백업코드를 입력하세요");
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        final EditText editText = new EditText(mContext);
-        editText.setLayoutParams(lp);
-        builder.setView(editText);
+        builder.setView(view);
 
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                getUserDataRequestToServer(editText.getText().toString().trim());
+                getUserDataRequestToServer(edtBackupCode.getText().toString().trim());
                 dialog.cancel();
             }
         });
@@ -381,8 +375,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 dialog.cancel();
             }
         });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        builder.show();
     }
 
     private void sendRegisterRequestToServer(String backupCode) {
@@ -395,10 +388,9 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                     boolean success = jsonObject.getBoolean("success");
 
                     if (success) {
-
+                        View view = View.inflate(getContext(), R.layout.backup_send3, null);
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        builder.setTitle("백업 완료")
-                                .setMessage("서버에 백업이 완료되었습니다");
+                        builder.setView(view);
 
                         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
@@ -406,24 +398,19 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                                 dialog.cancel();
                             }
                         });
-
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
+                        builder.show();
 
                     } else {
+                        View view = View.inflate(getContext(), R.layout.backup_send_reject, null);
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        builder.setTitle("백업 실패")
-                                .setMessage("[서버 오류] 백업 요청이 거절되었습니다+\n인터넷 연결을 확인해주세요");
-
+                        builder.setView(view);
                         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
                             }
                         });
-
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
+                        builder.show();
                     }
 
                 } catch (JSONException e) {
@@ -500,9 +487,9 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                         dbOpenHelper.close();
 
                         //완료 다이얼로그
+                        View view = View.inflate(getContext(), R.layout.backup_down2, null);
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        builder.setTitle("백업 받기 완료")
-                                .setMessage("백업이 완료되었습니다. 새로운 데이터가 추가됩니다.");
+                        builder.setView(view);
 
                         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
@@ -511,24 +498,18 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                                 dialog.cancel();
                             }
                         });
-
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
-
+                        builder.show();
                     } else {
+                        View view = View.inflate(getContext(), R.layout.backup_down_reject, null);
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        builder.setTitle("백업 실패")
-                                .setMessage("[서버 오류] 백업에 실패하였습니다+\n인터넷 연결을 확인해주세요");
-
+                        builder.setView(view);
                         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
                             }
                         });
-
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
+                        builder.show();
                     }
 
                 } catch (JSONException e) {

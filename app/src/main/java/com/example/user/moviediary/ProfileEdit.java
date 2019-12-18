@@ -58,6 +58,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -78,6 +80,9 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
     // 리퀘스트코드
     private static final int PICK_FROM_CAMERA = 2;
     private static final int PICK_FROM_ALBUM = 1;
+
+    // 이미지가 저장될 폴더 이름
+    private File storageDir;
 
     private static final String IS_CHANGE_PROFILE = "isChangeProfile";
 
@@ -222,6 +227,25 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                 String description = txtDescription.getText().toString().trim();
                 String name = txtName.getText().toString().trim();
 
+                // 프로필 이미지 바꿀때 안에 있는 파일 지워줌. 용량 차지하지 못하게 한다.
+                if(storageDir == null) {
+                    profileImgPath = UserData.profileImgPath;
+                } else if (storageDir.exists()) {
+                    File[] fileList = storageDir.listFiles();
+                    fileList = sortFileList(fileList);
+                    for (int i = 0; i < fileList.length - 1; i++) {
+                        if (fileList.length == 0) {
+                            break;
+                        }
+                        fileList[i].delete();
+                        Toast.makeText(getApplicationContext(), "파일삭제해씀", Toast.LENGTH_SHORT).show();
+                    }
+                    //storageDir.delete();
+                } else if (!storageDir.exists()) {
+                    storageDir.mkdirs();
+                    Toast.makeText(getApplicationContext(), "디렉토리만들겨", Toast.LENGTH_SHORT).show();
+                }
+
                 if (!description.equals("") && !name.equals("")) {
 
                     Log.d("User_check", name + ", " + description + ", " + profileImgPath);
@@ -263,6 +287,23 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
 
                 break;
         }
+    }
+
+    public File[] sortFileList(File[] files) {
+        Arrays.sort(files,
+                new Comparator<Object>() {
+                    @Override
+                    public int compare(Object object1, Object object2) {
+                        String s1 = "";
+                        String s2 = "";
+                        s1 = ((File) object1).getName();
+                        s2 = ((File) object2).getName();
+
+                        return s1.compareTo(s2);
+                    }
+                });
+
+        return files;
     }
 
     @Override
@@ -401,7 +442,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
         String imageFileName = "profileImage_" + timeStamp + "_";
 
         // 이미지가 저장될 폴더 이름
-        File storageDir = new File(Environment.getExternalStorageDirectory() + "/ProfileImage/");
+        storageDir = new File(Environment.getExternalStorageDirectory() + "/ProfileImage/");
 
         // 프로필 이미지 바꿀때 안에 있는 파일 지워줌. 용량 차지하지 못하게 한다.
         if (storageDir.exists()) {
