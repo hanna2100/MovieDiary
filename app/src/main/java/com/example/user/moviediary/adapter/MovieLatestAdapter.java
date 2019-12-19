@@ -1,9 +1,14 @@
 package com.example.user.moviediary.adapter;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -17,22 +22,42 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.fragment.FrgMovieComments;
 import com.example.user.moviediary.fragment.FrgMovieDetails;
 import com.example.user.moviediary.fragment.FrgPosting;
+import com.example.user.moviediary.fragment.FrgYoutubePlayer;
+import com.example.user.moviediary.model.MovieChart;
 import com.example.user.moviediary.model.MovieLatest;
+import com.example.user.moviediary.model.MoviePopular;
+import com.example.user.moviediary.model.MovieVideo;
+import com.example.user.moviediary.model.NaverMovie;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
+import com.example.user.moviediary.util.MoviesRepository;
+import com.example.user.moviediary.util.NaverMovieRepository;
+import com.example.user.moviediary.util.OnGetLatestMoviesCallback;
+import com.example.user.moviediary.util.OnGetNaverMovieCallback;
+import com.example.user.moviediary.util.OnGetPopularMoviesCallback;
+import com.example.user.moviediary.util.OnGetVideoCallback;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.LatestViewHolder>{
+public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.LatestViewHolder> {
 
     private List<MovieLatest.ResultsBean> list;
     private int layout;
@@ -64,7 +89,7 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
         //본문내용에 아이디+줄거리를 넣는데 아이디에만 색깔넣고 굵게하기
         String title = movie.getTitle();
         String overview = movie.getOverview();
-        String titleOverview = title+ "  " + overview;
+        String titleOverview = title + "  " + overview;
         titleOverview = titleOverview.replace(" ", "\u00A0");
         int titleLength = title.length();
         SpannableStringBuilder customColor = new SpannableStringBuilder(titleOverview);
@@ -77,7 +102,7 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
         viewHolder.tvLatestTitle.setText(title);
 
         //동그란 포스터이미지 설정
-        if (movie.getPoster_path()!=null) {
+        if (movie.getPoster_path() != null) {
             String url = "https://image.tmdb.org/t/p/w92" + movie.getPoster_path();
 
             GlideApp.with(viewHolder.itemView).load(url)
@@ -88,7 +113,7 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
         viewHolder.ivLatestPoster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)context).setChangeFragment(FrgMovieDetails.newInstance(movie.getId()));
+                ((MainActivity) context).setChangeFragment(FrgMovieDetails.newInstance(movie.getId()));
 
             }
         });
@@ -97,13 +122,13 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
         viewHolder.btnLatestMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)context).setChangeFragment(FrgMovieDetails.newInstance(movie.getId()));
+                ((MainActivity) context).setChangeFragment(FrgMovieDetails.newInstance(movie.getId()));
 
             }
         });
 
         //본문내용에 들어갈 영화 섬네일 설정
-        if (movie.getPoster_path()!=null) {
+        if (movie.getPoster_path() != null) {
             String url = "https://image.tmdb.org/t/p/w1280" + movie.getBackdrop_path();
 
             GlideApp.with(context).load(url)
@@ -153,10 +178,10 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
             @Override
             public void run() {
                 int lineCnt = viewHolder.tvContent.getLineCount();
-                Log.d("cntTest", "movie = "+movie.getTitle()+", 카운트 = "+lineCnt);
-                if(lineCnt<6){
+                Log.d("cntTest", "movie = " + movie.getTitle() + ", 카운트 = " + lineCnt);
+                if (lineCnt < 6) {
                     viewHolder.ibMore.setVisibility(View.GONE);
-                }else{
+                } else {
                     viewHolder.tvContent.setMaxLines(5);
                     viewHolder.ibMore.setVisibility(View.VISIBLE);
                 }
@@ -181,7 +206,42 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
             }
         });
 
+        viewHolder.ibComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NaverMovieRepository naverMovieRepository = NaverMovieRepository.getInstance();
+
+                //개봉년도 구하기 (연도만 추출)
+                String releaseDate = movie.getRelease_date();
+                String releaseYear = releaseDate.substring(0, 4);
+
+                //네이버 영화api 검색실행(한국,미국간 개봉일 차이때문에 시작하는 검색 시작하는 년도는 한국 개봉년도에-1을 해줌)
+                naverMovieRepository.getMovieResult(context, movie.getTitle(), ""+(Integer.parseInt(releaseYear)-1), releaseYear
+                        , new OnGetNaverMovieCallback() {
+                            @Override
+                            public void onSuccess(NaverMovie.ItemsBean movieItem) {
+                                Log.d("네이버", movieItem.getLink());
+                                //영화 기본페이지 링크
+                                String basicLink = movieItem.getLink();
+                                //아이디만 추출
+                                String movieId = basicLink.replaceAll("[^0-9]","");
+                                //댓글 프래그먼트 로드
+                                FrgMovieComments dialog = (FrgMovieComments.newInstance(movieId, 1));
+                                dialog.show(((MainActivity)context).getSupportFragmentManager(), null);
+
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(context, "네이버 댓글 로드에 실패하였습니다", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+
+        });
+
     }
+
 
     @Override
     public int getItemCount() {
@@ -189,11 +249,10 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
     }
 
 
-
     public class LatestViewHolder extends RecyclerView.ViewHolder {
         TextView tvContent, tvLatestTitle;
         ImageView ivLatestPoster, ivBackdrop;
-        ImageButton ibMore, ibLess, ibUnlike, ibLike;
+        ImageButton ibMore, ibLess, ibUnlike, ibLike, ibComments;
         Button btnLatestMore;
 
         public LatestViewHolder(@NonNull View itemView) {
@@ -207,6 +266,7 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
             this.btnLatestMore = itemView.findViewById(R.id.btnLatestMore);
             this.ibUnlike = itemView.findViewById(R.id.ibUnlike);
             this.ibLike = itemView.findViewById(R.id.ibLike);
+            this.ibComments = itemView.findViewById(R.id.ibComments);
 
             ViewGroup.LayoutParams layoutParams = ivBackdrop.getLayoutParams();
             layoutParams.width = MainActivity.deviceWidth;
@@ -222,10 +282,10 @@ public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.
             boolean isExistLike = dbOpenHelper.isExistLikeColumn(movie_id);
             dbOpenHelper.close();
 
-            if(isExistLike) {
+            if (isExistLike) {
                 ibLike.setVisibility(View.VISIBLE);
                 ibUnlike.setVisibility(View.GONE);
-            }else{
+            } else {
                 ibLike.setVisibility(View.GONE);
                 ibUnlike.setVisibility(View.VISIBLE);
             }

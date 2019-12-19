@@ -23,6 +23,16 @@ public interface TMDBApi {
             @Query("include_adult") boolean include_adult
     );
 
+    @GET("search/movie")
+    Call<SearchResults> searchMoviesByTitleAndReleaseDate(
+            @Query("api_key") String apiKey,
+            @Query("language") String language,
+            @Query("query") String query,
+            @Query("page") int page,
+            @Query("include_adult") boolean include_adult,
+            @Query("primary_release_year") int primary_release_year
+    );
+
     @GET("movie/{movie_id}")
     Call<MovieDetails> getMovieDetails(
             @Path("movie_id") int movie_id,

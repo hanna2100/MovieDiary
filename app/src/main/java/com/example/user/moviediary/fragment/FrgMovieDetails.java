@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
@@ -34,10 +35,13 @@ import com.example.user.moviediary.adapter.MovieRcmAdapter;
 import com.example.user.moviediary.model.MovieDetails;
 import com.example.user.moviediary.model.MovieRecommendations;
 import com.example.user.moviediary.model.MovieVideo;
+import com.example.user.moviediary.model.NaverMovie;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 import com.example.user.moviediary.util.MoviesRepository;
+import com.example.user.moviediary.util.NaverMovieRepository;
 import com.example.user.moviediary.util.OnGetDetailsCallback;
+import com.example.user.moviediary.util.OnGetNaverMovieCallback;
 import com.example.user.moviediary.util.OnGetRecommendationsCallback;
 import com.example.user.moviediary.util.OnGetVideoCallback;
 import com.yarolegovich.discretescrollview.DSVOrientation;
@@ -130,6 +134,7 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         ibUnlike = view.findViewById(R.id.ibUnlike);
         ibMore = view.findViewById(R.id.ibMore);
         ibLess = view.findViewById(R.id.ibLess);
+        ImageView ivComments = view.findViewById(R.id.ivComments);
 
         dbOpenHelper = new DbOpenHelper(mContext);
 
@@ -137,6 +142,7 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
         ibLess.setOnClickListener(this);
         ibLike.setOnClickListener(this);
         ibUnlike.setOnClickListener(this);
+        ivComments.setOnClickListener(this);
         btnPosting.setOnClickListener(this);
 
         moviesRepository = MoviesRepository.getInstance();
@@ -195,7 +201,40 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
                         , currentMovieDetails.getTitle(), currentMovieDetails.getPoster_path()));
                 break;
 
+            case R.id.ivComments:
+                onClickComments();
+                break;
+
         }
+    }
+
+    private void onClickComments() {
+        NaverMovieRepository naverMovieRepository = NaverMovieRepository.getInstance();
+
+        //개봉년도 구하기 (연도만 추출)
+        String releaseDate = currentMovieDetails.getRelease_date();
+        String releaseYear = releaseDate.substring(0, 4);
+        //네이버 영화api 검색실행(한국,미국간 개봉일 차이때문에 시작하는 검색 시작하는 년도는 한국 개봉년도에-1을 해줌)
+        naverMovieRepository.getMovieResult(mContext, currentMovieDetails.getTitle(), ""+(Integer.parseInt(releaseYear)-1), releaseYear
+                , new OnGetNaverMovieCallback() {
+                    @Override
+                    public void onSuccess(NaverMovie.ItemsBean movieItem) {
+                        Log.d("네이버", movieItem.getLink());
+                        //영화 기본페이지 링크
+                        String basicLink = movieItem.getLink();
+                        //아이디만 추출
+                        String movieId = basicLink.replaceAll("[^0-9]","");
+                        //댓글 프래그먼트 로드
+                        FrgMovieComments dialog = (FrgMovieComments.newInstance(movieId, 1));
+                        dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(mContext, "네이버 댓글 로드에 실패하였습니다", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void showDatabase(String tbl_name, String sort){

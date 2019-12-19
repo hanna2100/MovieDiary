@@ -12,6 +12,8 @@ import com.example.user.moviediary.model.MovieRecommendations;
 import com.example.user.moviediary.model.MovieVideo;
 import com.example.user.moviediary.model.SearchResults;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,7 +55,7 @@ public class MoviesRepository {
         return repository;
     }
 
-    /* 영화 검색 메소드 시작 */
+    // 영화 검색 메소드 시작
     public void getSearchedMovieResult(Context context, final OnGetMoviesCallback callback) {
 
         SharedPreferences pref = context.getSharedPreferences(INCLUDE_ADULT,Activity.MODE_PRIVATE);
@@ -67,10 +69,12 @@ public class MoviesRepository {
             public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
                 SearchResults results = response.body();
 
-                if (results != null && results.getResults() != null)
+                if (results != null && results.getResults() != null) {
                     callback.onSuccess(results.getResults());
-                else
+                }
+                else {
                     callback.onError();
+                }
             }
 
             @Override
@@ -96,9 +100,42 @@ public class MoviesRepository {
         return page;
     }
 
-    /* ~ 여기까지가 영화 검색관련 메소드
+    // ~ 여기까지가 영화 검색관련 메소드
 
-      영화 디테일정보얻기 메소드 시작 */
+    // 영화 타이틀+개봉일자 조건으로 검색 메소드 시작
+    public void searchMoviesByTitleAndReleaseDate(Context context, int releaseYear, final OnGetMoviesByTitleAndReleaseDate callback) {
+
+        SharedPreferences pref = context.getSharedPreferences(INCLUDE_ADULT,Activity.MODE_PRIVATE);
+        boolean check = pref.getBoolean(ADULT,false);
+        include_adult = check;
+        Log.d("태그", "성인영화포함여부="+include_adult);
+
+        Call<SearchResults> call = api.searchMoviesByTitleAndReleaseDate(DeveloperKey.TMDB, LANGUAGE, query, page, include_adult, releaseYear);
+        call.enqueue(new Callback<SearchResults>() {
+            @Override
+            public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
+                SearchResults results = response.body();
+                Log.d("MovieChartAdapter :", "onResponse");
+                if (results != null && results.getResults() != null) {
+                    List<SearchResults.ResultsBean> list = results.getResults();
+                    SearchResults.ResultsBean movieDetails = list.get(0);
+
+                    callback.onSuccess(movieDetails);
+                }else
+                    callback.onError();
+
+            }
+
+            @Override
+            public void onFailure(Call<SearchResults> call, Throwable t) {
+                Log.d("MovieChartAdapter :", "onFailure");
+                callback.onError();
+            }
+        });
+    }
+
+
+    //영화 디테일정보얻기 메소드 시작
     public void getMovieDetailsResult(int movie_id, final OnGetDetailsCallback callback) {
         Call<MovieDetails> call = api.getMovieDetails(movie_id, DeveloperKey.TMDB, LANGUAGE);
         call.enqueue(new Callback<MovieDetails>() {
@@ -113,6 +150,7 @@ public class MoviesRepository {
                 }
                 else
                     callback.onError();
+
             }
 
             @Override
@@ -140,6 +178,7 @@ public class MoviesRepository {
                     callback.onSuccess(results);
                 else
                     callback.onError();
+
             }
 
             @Override
