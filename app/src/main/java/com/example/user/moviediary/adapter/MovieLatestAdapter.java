@@ -24,38 +24,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
 import com.example.user.moviediary.fragment.FrgMovieComments;
 import com.example.user.moviediary.fragment.FrgMovieDetails;
-import com.example.user.moviediary.fragment.FrgPosting;
-import com.example.user.moviediary.fragment.FrgYoutubePlayer;
-import com.example.user.moviediary.model.MovieChart;
 import com.example.user.moviediary.model.MovieLatest;
-import com.example.user.moviediary.model.MoviePopular;
-import com.example.user.moviediary.model.MovieVideo;
 import com.example.user.moviediary.model.NaverMovie;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
-import com.example.user.moviediary.util.MoviesRepository;
 import com.example.user.moviediary.util.NaverMovieRepository;
-import com.example.user.moviediary.util.OnGetLatestMoviesCallback;
 import com.example.user.moviediary.util.OnGetNaverMovieCallback;
-import com.example.user.moviediary.util.OnGetPopularMoviesCallback;
-import com.example.user.moviediary.util.OnGetVideoCallback;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 import java.util.List;
 
-import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class MovieLatestAdapter extends RecyclerView.Adapter<MovieLatestAdapter.LatestViewHolder> {
 
