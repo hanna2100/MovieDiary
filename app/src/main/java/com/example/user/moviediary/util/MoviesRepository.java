@@ -69,7 +69,7 @@ public class MoviesRepository {
             public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
                 SearchResults results = response.body();
 
-                if (results != null && results.getResults() != null) {
+                if (results != null && results.getResults().size() != 0) {
                     callback.onSuccess(results.getResults());
                 }
                 else {
@@ -116,7 +116,7 @@ public class MoviesRepository {
             public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
                 SearchResults results = response.body();
                 Log.d("MovieChartAdapter :", "onResponse");
-                if (results != null && results.getResults() != null) {
+                if (results != null && results.getResults().size() !=0) {
                     List<SearchResults.ResultsBean> list = results.getResults();
                     SearchResults.ResultsBean movieDetails = list.get(0);
 
@@ -201,7 +201,7 @@ public class MoviesRepository {
 
                 MovieRecommendations results = response.body();
 
-                if (results.getResults().size() != 0 && results.getResults() != null) {
+                if (results.getResults().size() != 0 && results.getResults().size() !=0) {
                     callback.onSuccess(results.getResults());
                 } else {
                     callback.onError();
@@ -227,7 +227,7 @@ public class MoviesRepository {
 
                 MoviePopular results = response.body();
 
-                if (results.getResults().size() != 0 && results.getResults() != null) {
+                if (results.getResults().size() != 0 && results.getResults().size() != 0) {
                     Log.d(TAG, results.getResults().toString());
                     callback.onSuccess(results.getResults());
                 } else {
@@ -253,7 +253,7 @@ public class MoviesRepository {
 
                 MovieLatest results = response.body();
 
-                if (results.getResults().size() != 0 && results.getResults() != null) {
+                if (results.getResults().size() != 0 && results.getResults().size() != 0) {
                     Log.d(TAG, results.getResults().toString());
                     Log.d(TAG, "토탈페이지 = "+results.getTotal_pages());
                     Log.d(TAG, "전체결과 = "+results.getTotal_results());

@@ -102,7 +102,7 @@ public class MovieChartAdapter extends RecyclerView.Adapter<MovieChartAdapter.Cu
 
             @Override
             public void onError() {
-                Toast.makeText(context, "영화정보를 가져올 수 없습니다. 직접 검색을 해주세요.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "영화정보를 가져올 수 없습니다" +"\n직접 검색을 해주세요", Toast.LENGTH_SHORT).show();
             }
         });
 
