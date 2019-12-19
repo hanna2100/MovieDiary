@@ -30,6 +30,7 @@ import com.example.user.moviediary.R;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class FrgPosting extends Fragment implements View.OnClickListener {
@@ -182,14 +183,15 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), "입력되지않은 항목이 있습니다. 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                // 현재 날짜 가져오기
-                Calendar post_date = Calendar.getInstance();
-                int post_date_y = post_date.get(Calendar.YEAR);
-                int post_date_m = post_date.get(Calendar.MONTH);
-                int post_date_d = post_date.get(Calendar.DAY_OF_MONTH);
+                // 현재 날짜,시간 가져오기
+                long now = System.currentTimeMillis();
+                SimpleDateFormat curDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateTime = curDateTime.format(now);
 
-                String postDate = post_date_y + "-" + (post_date_m + 1) + "-" + post_date_d;
+                Log.d("curDateTime",dateTime);
 
+                String mvTitleCheck = postingTitle.getText().toString();
+                mvTitleCheck = mvTitleCheck.replace(" ","");
 
                 String edtReviewCheck = edtReview.getText().toString();
                 edtReviewCheck = edtReviewCheck.replace("\n"," \n");
@@ -198,9 +200,9 @@ public class FrgPosting extends Fragment implements View.OnClickListener {
                 // DB에 넣어준다
                 dbOpenHelper.openPosting();
                 dbOpenHelper.createPostingHelper();
-                dbOpenHelper.insertPostingColumn(movie_id, postingTitle.getText().toString().trim(),
+                dbOpenHelper.insertPostingColumn(movie_id, mvTitleCheck,
                         posterPath, postingDate.getText().toString().trim(),
-                        postDate, postingRatingBar.getRating(), edtReviewCheck+" ");
+                        dateTime, postingRatingBar.getRating(), edtReviewCheck+" ");
                 // DB확인. 나중에 지워줭
                 showDatabase("posting_tbl", "mv_id");
 

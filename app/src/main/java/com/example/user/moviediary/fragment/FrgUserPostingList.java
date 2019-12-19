@@ -43,7 +43,7 @@ public class FrgUserPostingList extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        insertList("posting_tbl","post_date DESC, mv_date DESC");
+        insertList("posting_tbl","post_date DESC");
 
         adapter = new MovieDiaryAdapter(R.layout.item_user, list);
         Log.d("ViewPager", "postlist size = "+list.size());

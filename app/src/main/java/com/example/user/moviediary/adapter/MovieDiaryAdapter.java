@@ -1,7 +1,8 @@
 package com.example.user.moviediary.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,11 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
 import com.example.user.moviediary.MainActivity;
 import com.example.user.moviediary.R;
+import com.example.user.moviediary.fragment.FrgMovieDetails;
 import com.example.user.moviediary.fragment.FrgMovieDiaryDetails;
+import com.example.user.moviediary.fragment.FrgUser;
 import com.example.user.moviediary.model.MovieDiary;
 import com.example.user.moviediary.util.DbOpenHelper;
 import com.example.user.moviediary.util.GlideApp;
@@ -26,6 +27,7 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
     private ArrayList<MovieDiary> list;
     private View view;
     private Context context;
+    private DbOpenHelper dbOpenHelper;
 
     public MovieDiaryAdapter(int layout, ArrayList<MovieDiary> list) {
         this.layout = layout;
@@ -49,6 +51,7 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
 
         GlideApp.with(context).load(movieDiary.getDetailImage()).into(customViewHolder.imageView);
 
+
         customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +62,38 @@ public class MovieDiaryAdapter extends RecyclerView.Adapter<MovieDiaryAdapter.Cu
                 dialog.show(((MainActivity)context).getSupportFragmentManager(), null);
             }
         });
+
+        customViewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // 취소 재확인 다이얼로그 띄움
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("다이어리 삭제").setMessage("다이어리를 삭제하시겠습니까?");
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dbOpenHelper = new DbOpenHelper(context);
+                        dbOpenHelper.openPosting();
+                        dbOpenHelper.deletePostingColumns(list.get(i).getMv_id());
+                        dbOpenHelper.close();
+
+                        ((MainActivity) context).setChangeFragment(FrgUser.newInstance());
+                    }
+                });
+
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // 삭제 취소
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                return true;
+            }
+        });
+
 
     }
 

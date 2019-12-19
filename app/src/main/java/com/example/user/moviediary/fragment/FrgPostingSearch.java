@@ -78,6 +78,7 @@ public class FrgPostingSearch extends Fragment implements TextView.OnEditorActio
 
         title = getArguments().getString("title");
 
+        title = title.replace(" ", "");
         insertList(title);
 
         edtPostingSearch.setOnEditorActionListener(this);
@@ -93,7 +94,7 @@ public class FrgPostingSearch extends Fragment implements TextView.OnEditorActio
         list.clear();
         dbOpenHelper = new DbOpenHelper(getContext());
         dbOpenHelper.openPosting();
-        Cursor cursor = dbOpenHelper.searchPostingColumn("title",title);
+        Cursor cursor = dbOpenHelper.searchPostingColumn("title", title);
         while (cursor.moveToNext()) {
 
             tempMvId = cursor.getInt(cursor.getColumnIndex("mv_id"));
@@ -104,10 +105,10 @@ public class FrgPostingSearch extends Fragment implements TextView.OnEditorActio
             tempStar = cursor.getFloat(cursor.getColumnIndex("star"));
             tempContent = cursor.getString(cursor.getColumnIndex("content"));
 
-            list.add(new MovieDiary(tempMvId,tempPoster,tempTitle,tempStar,tempMovieDate,tempContent));
+            list.add(new MovieDiary(tempMvId, tempPoster, tempTitle, tempStar, tempMovieDate, tempContent));
         }
 
-        Log.d("SIZE_CHECK",String.valueOf(list.size()));
+        Log.d("SIZE_CHECK", String.valueOf(list.size()));
 
         dbOpenHelper.close();
     }
@@ -115,6 +116,7 @@ public class FrgPostingSearch extends Fragment implements TextView.OnEditorActio
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         String searchMovieTitle = edtPostingSearch.getText().toString().trim();
+        searchMovieTitle = searchMovieTitle.replace(" ", "");
         insertList(searchMovieTitle);
 
         edtPostingSearch.setText(searchMovieTitle);
