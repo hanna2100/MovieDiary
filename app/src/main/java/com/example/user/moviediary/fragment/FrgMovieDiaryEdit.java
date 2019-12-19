@@ -110,6 +110,12 @@ public class FrgMovieDiaryEdit extends DialogFragment implements View.OnClickLis
         detailDate.setOnClickListener(this);
         btnEditCancel.setOnClickListener(this);
         btnEditSave.setOnClickListener(this);
+        detailContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                detailContent.setHeight(500);
+            }
+        });
 
         return view;
     }
@@ -157,6 +163,7 @@ public class FrgMovieDiaryEdit extends DialogFragment implements View.OnClickLis
                 dismiss();
 
                 break;
+
         }
     }
 
