@@ -146,6 +146,12 @@ public class DbOpenHelper {
         return c;
     }
 
+    public boolean isExistPostingColumn(int mv_id) {
+        Cursor c = mDB.rawQuery("SELECT * FROM posting_tbl WHERE mv_id = " + mv_id, null);
+        return c.getCount() > 0;
+    }
+
+
     ///////////////////////////////////////////////////
     //라이크 테이블 CRUD 모음
 

@@ -458,8 +458,10 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                             JsonElement title = object.get("title");
                             JsonElement poster = object.get("poster");
 
-                            dbOpenHelper.insertLikeColumn(id.getAsInt(), title.getAsString(), poster.getAsString());
+                            if (!dbOpenHelper.isExistLikeColumn(id.getAsInt())) {
+                                dbOpenHelper.insertLikeColumn(id.getAsInt(), title.getAsString(), poster.getAsString());
 
+                            }
                         }
 
                         //포스팅 디비 오픈
@@ -477,10 +479,11 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                             JsonElement movie_date = object.get("movie_date");
                             JsonElement posting_date = object.get("posting_date");
 
-                            dbOpenHelper.insertPostingColumn(id.getAsInt(), title.getAsString()
-                                    , poster.getAsString(), movie_date.getAsString()
-                                    , posting_date.getAsString(), star.getAsFloat(), content.getAsString());
-
+                            if (!dbOpenHelper.isExistPostingColumn(id.getAsInt())) {
+                                dbOpenHelper.insertPostingColumn(id.getAsInt(), title.getAsString()
+                                        , poster.getAsString(), movie_date.getAsString()
+                                        , posting_date.getAsString(), star.getAsFloat(), content.getAsString());
+                            }
                         }
 
                         //디비 닫기
@@ -526,6 +529,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
         queue.add(registerRequest);
     }
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
