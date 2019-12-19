@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.support.v7.widget.SearchView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +49,7 @@ public class FrgMovieSearch extends Fragment {
     private MovieSearchAdapter adapter;
     private List<SearchResults.ResultsBean> list;
     private RecyclerView rcvSearch;
+    private LinearLayout searchMain;
 
     private boolean isPostingFrg;
 
@@ -80,6 +82,7 @@ public class FrgMovieSearch extends Fragment {
         isPostingFrg = getArguments().getBoolean(IS_POSTING_FRG);
 
         rcvSearch = view.findViewById(R.id.rcvSearch);
+        searchMain = view.findViewById(R.id.searchMain);
 
         rcvSearch.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -175,6 +178,7 @@ public class FrgMovieSearch extends Fragment {
                 rcvSearch.setAdapter(adapter);
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
                 rcvSearch.setLayoutManager(linearLayoutManager);
+                searchMain.setVisibility(View.GONE);
             }
 
             @Override
@@ -186,7 +190,6 @@ public class FrgMovieSearch extends Fragment {
                 }
             }
         });
-
 
     }
 }
