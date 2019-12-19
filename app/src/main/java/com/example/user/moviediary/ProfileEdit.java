@@ -85,7 +85,8 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
     private File storageDir;
 
     private static final String IS_CHANGE_PROFILE = "isChangeProfile";
-
+    // 뒤로가기 버튼 입력시간이 담길 long 객체
+    private long backbtnTime = 0l;
     //카카오 로그인
     SessionCallback callback;
     LoginButton loginKakaoReal;
@@ -260,6 +261,7 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                     Intent intent = new Intent(ProfileEdit.this, MainActivity.class);
                     intent.putExtra(IS_CHANGE_PROFILE, true);
                     startActivity(intent);
+                    finish();
 
                 } else {
                     Toast.makeText(this, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
@@ -525,6 +527,21 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
         public void onSessionOpenFailed(KakaoException e) {
             Log.d("카카오", "onSessionOpenFailed");
             Toast.makeText(ProfileEdit.this, "로그인 도중 오류가 발생했습니다. 인터넷 연결을 확인해주세요: " + e.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        long currentTime = System.currentTimeMillis();
+        long getTime = currentTime - backbtnTime;
+
+        if (getTime >= 0 && getTime < 500) {
+            finish();
+        } else {
+            super.onBackPressed();
+            backbtnTime = currentTime;
         }
     }
 

@@ -231,6 +231,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 // 프로필 수정 창 뜨게 하기
                 Intent intent = new Intent(getContext(), ProfileEdit.class);
                 startActivity(intent);
+                ((MainActivity)(mContext)).finish();
                 // ((MainActivity) mContext).setChangeFragment(FrgUserProfileEdit.newInstance());
                 break;
 
