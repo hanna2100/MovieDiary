@@ -50,8 +50,8 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_thumb_up"
                     android:layout_marginRight="7dp"/>
 
@@ -61,11 +61,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:text="000"
+                    android:textSize="11sp"
                     android:textColor="#a3a3a3"/>
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_thumb_down"
                     android:layout_marginRight="7dp" />
 
@@ -74,6 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="000"
+                    android:textSize="11sp"
                     android:textColor="#a3a3a3"/>
 
             </LinearLayout>

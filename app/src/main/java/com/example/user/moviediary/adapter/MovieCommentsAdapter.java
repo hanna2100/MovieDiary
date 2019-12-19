@@ -1,8 +1,14 @@
 package com.example.user.moviediary.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,10 +47,18 @@ public class MovieCommentsAdapter extends RecyclerView.Adapter<MovieCommentsAdap
 
         String star = mc.getStar();
         viewHolder.star.setText(star);
-        viewHolder.ratingBar.setRating((Float.parseFloat(star))/2);
+        viewHolder.ratingBar.setRating((Float.parseFloat(star)) / 2);
         viewHolder.userId.setText(mc.getId());
-        viewHolder.comment.setText(mc.getComent());
 
+        String reple = mc.getComent();
+        if (reple.substring(0, 3).equals("관람객")) {
+            SpannableStringBuilder customColor = new SpannableStringBuilder(reple);
+            customColor.setSpan(new ForegroundColorSpan(Color.parseColor("#eb9000")), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            customColor.setSpan(new StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            viewHolder.comment.setText(customColor);
+        } else {
+            viewHolder.comment.setText(mc.getComent());
+        }
         String symUP = mc.getSymUp();
         symUP = symUP.replaceAll("[^0-9]", "");
         String symDown = mc.getSymDown();
@@ -55,7 +69,7 @@ public class MovieCommentsAdapter extends RecyclerView.Adapter<MovieCommentsAdap
     }
 
     @Override
-    public int getItemCount()  {
+    public int getItemCount() {
         return list != null ? list.size() : 0;
     }
 
