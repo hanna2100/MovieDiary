@@ -51,7 +51,7 @@ public class MovieCommentsAdapter extends RecyclerView.Adapter<MovieCommentsAdap
         viewHolder.userId.setText(mc.getId());
 
         String reple = mc.getComent();
-        if (reple.substring(0, 3).equals("관람객")) {
+        if (reple.length()>2 && reple.substring(0, 3).equals("관람객")) {
             SpannableStringBuilder customColor = new SpannableStringBuilder(reple);
             customColor.setSpan(new ForegroundColorSpan(Color.parseColor("#eb9000")), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             customColor.setSpan(new StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

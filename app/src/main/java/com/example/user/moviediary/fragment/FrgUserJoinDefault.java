@@ -139,6 +139,7 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
                     Log.d(TAG, name + ", " + description + ", " + profileImgPath);
                     Intent intent = new Intent(mContext, MainActivity.class);
                     startActivity(intent);
+                    ((UserJoinActivity)mContext).finish();
                 } else {
                     Toast.makeText(mContext, "입력되지 않은 정보가 있습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -349,12 +350,10 @@ public class FrgUserJoinDefault extends Fragment implements View.OnClickListener
                     break;
                 }
                 fileList[i].delete();
-                Toast.makeText(mContext, "파일삭제해씀", Toast.LENGTH_SHORT).show();
             }
             //storageDir.delete();
         } else if (!storageDir.exists()) {
             storageDir.mkdirs();
-            Toast.makeText(mContext, "디렉토리만들겨", Toast.LENGTH_SHORT).show();
         }
 
         // 빈 파일 생성

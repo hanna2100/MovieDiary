@@ -231,7 +231,7 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
                 // 프로필 수정 창 뜨게 하기
                 Intent intent = new Intent(getContext(), ProfileEdit.class);
                 startActivity(intent);
-                ((MainActivity)(mContext)).finish();
+                ((MainActivity) (mContext)).finish();
                 // ((MainActivity) mContext).setChangeFragment(FrgUserProfileEdit.newInstance());
                 break;
 
@@ -650,26 +650,31 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
     //로그아웃 버튼 클릭시
     private void onClickBtnLogout() {
         // 로그아웃 재확인 다이얼로그
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Logout").setMessage("로그아웃 하시겠습니까?\n모든 다이어리 정보가 삭제됩니다.");
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
+
                 if (UserData.kakaoLogin != 0) {
+                    userDatabaseRecreate();
                     onClickLogout();
 
                 } else {
                     userDatabaseRecreate();
+
                     //액티비티 recreate
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         mActivity.recreate();
+                        ((MainActivity)mContext).finish();
+                    }
 
                     else {
                         Intent i = mActivity.getPackageManager().getLaunchIntentForPackage(mActivity.getPackageName());
                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         mActivity.startActivity(i);
+                        ((MainActivity)mContext).finish();
                     }
-
                 }
             }
         });
@@ -687,7 +692,6 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
     //카톡 로그아웃일 경우
     private void onClickLogout() {
-        userDatabaseRecreate();
 
         final String appendMessage = getString(R.string.com_kakao_confirm_unlink);
         new AlertDialog.Builder(mContext)
@@ -704,20 +708,43 @@ public class FrgUser extends Fragment implements View.OnClickListener, View.OnTo
 
                                     @Override
                                     public void onSessionClosed(ErrorResult errorResult) {
-                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                        builder.setTitle("로그아웃 오류").setMessage("로그아웃 세션이 닫혔습니다. 어플리케이션이 종료됩니다.");
+                                        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                ((MainActivity)mContext).finish();
+                                            }
+                                        });
+
+
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
                                     }
 
                                     @Override
                                     public void onNotSignedUp() {
-                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                        builder.setTitle("로그아웃 오류").setMessage("가입하지 않거나 이미 탈퇴한 회원입니다. 어플리케이션이 종료됩니다.");
+                                        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                ((MainActivity)mContext).finish();
+                                            }
+                                        });
+
+
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
                                     }
 
                                     @Override
                                     public void onSuccess(Long userId) {
-                                        startActivity(new Intent(mActivity, UserJoinActivity.class));
+                                        //startActivity(new Intent(mContext, UserJoinActivity.class));
+                                        mActivity.recreate();
                                     }
                                 });
-                                dialog.dismiss();
+
                             }
                         })
                 .setNegativeButton(getString(R.string.com_kakao_cancel_button),

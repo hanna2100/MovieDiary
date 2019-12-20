@@ -166,7 +166,9 @@ public class FrgMovieDiaryDetails extends DialogFragment {
                                 dbOpenHelper.close();
                                 Toast.makeText(getContext(), "다이어리가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                                 bottomSheetDialog.dismiss();
+
                                 ((MainActivity) mContext).setChangeFragment(FrgUser.newInstance());
+                                dismiss();
                             }
                         });
 

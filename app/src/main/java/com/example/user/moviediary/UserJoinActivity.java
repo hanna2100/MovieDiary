@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -39,6 +40,8 @@ public class UserJoinActivity extends AppCompatActivity implements View.OnClickL
     LoginButton loginKakaoReal;
     FrameLayout flLoginMain;
     LinearLayout llLoginMain;
+    // 뒤로가기 버튼 입력시간이 담길 long 객체
+    private long backbtnTime = 0l;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,7 @@ public class UserJoinActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().hide();
 
         setContentView(R.layout.fragment_user_join);
+
 
         ImageButton ibLoginDefault = findViewById(R.id.ibLoginDefault);
         ImageButton ibLoginKakao = findViewById(R.id.ibLoginKakao);
@@ -161,6 +165,12 @@ public class UserJoinActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+
 
     //카카오 디벨로퍼에서 사용할 키값 <-한번만 쓰고 마는건데 그냥 남겨둠
     private void getAppKeyHash() {
@@ -177,5 +187,7 @@ public class UserJoinActivity extends AppCompatActivity implements View.OnClickL
             Log.d("해시키", e.toString());
         }
     }
+
+
 
 }

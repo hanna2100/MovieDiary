@@ -239,12 +239,10 @@ public class ProfileEdit extends AppCompatActivity implements View.OnClickListen
                             break;
                         }
                         fileList[i].delete();
-                        Toast.makeText(getApplicationContext(), "파일삭제해씀", Toast.LENGTH_SHORT).show();
                     }
                     //storageDir.delete();
                 } else if (!storageDir.exists()) {
                     storageDir.mkdirs();
-                    Toast.makeText(getApplicationContext(), "디렉토리만들겨", Toast.LENGTH_SHORT).show();
                 }
 
                 if (!description.equals("") && !name.equals("")) {

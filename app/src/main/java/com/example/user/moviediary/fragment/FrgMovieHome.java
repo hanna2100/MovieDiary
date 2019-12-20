@@ -201,7 +201,7 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
 
         }
 
-        private void crawlingCGVMovieChart() {
+        private void  crawlingCGVMovieChart() {
 
             Document doc = null;
             try {
@@ -219,6 +219,7 @@ public class FrgMovieHome extends Fragment implements View.OnClickListener {
                 Elements greatElements = doc.select("div.box-contents span.percent");
                 Elements releaseElements = doc.select("div.box-contents span.txt-info");
 
+                list.clear();
                 //1위~7위까지의 각 영화 정보 얻어오기
                 for (int i = 0; i < 7; i++) {
                     Element titleElement = titleElements.get(i);

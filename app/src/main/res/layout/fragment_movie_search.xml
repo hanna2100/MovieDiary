@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:src="@drawable/search_main"/>
+            android:src="@drawable/search_main" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

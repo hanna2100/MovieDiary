@@ -50,6 +50,7 @@ public class FrgMovieSearch extends Fragment {
     private List<SearchResults.ResultsBean> list;
     private RecyclerView rcvSearch;
     private LinearLayout searchMain;
+    private MenuItem movieSearch;
 
     private boolean isPostingFrg;
 
@@ -83,6 +84,7 @@ public class FrgMovieSearch extends Fragment {
 
         rcvSearch = view.findViewById(R.id.rcvSearch);
         searchMain = view.findViewById(R.id.searchMain);
+        searchMain.setAlpha((float) 0.5);
 
         rcvSearch.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -118,7 +120,7 @@ public class FrgMovieSearch extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.movie_search, menu);
 
-        MenuItem movieSearch = menu.findItem(R.id.movieSearch);
+        movieSearch = menu.findItem(R.id.movieSearch);
         SearchView searchView = (SearchView) movieSearch.getActionView();
         SearchManager searchManager = (SearchManager) mContext.getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
@@ -183,11 +185,7 @@ public class FrgMovieSearch extends Fragment {
 
             @Override
             public void onError() {
-                if (word.equals("")) {
-                    Toast.makeText(mContext, "검색어를 입력하세요", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(mContext, "인터넷 연결을 확인하세요", Toast.LENGTH_SHORT).show();
-                }
+
             }
         });
 

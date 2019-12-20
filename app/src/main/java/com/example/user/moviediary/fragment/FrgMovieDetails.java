@@ -153,7 +153,7 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
 
             case R.id.ibMore:
                 tvOverview.setMaxLines(Integer.MAX_VALUE);
@@ -209,13 +209,13 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     }
 
     private void onClickComments() {
-        NaverMovieRepository naverMovieRepository = NaverMovieRepository.getInstance();
+        final NaverMovieRepository naverMovieRepository = NaverMovieRepository.getInstance();
 
         //개봉년도 구하기 (연도만 추출)
         String releaseDate = currentMovieDetails.getRelease_date();
         String releaseYear = releaseDate.substring(0, 4);
         //네이버 영화api 검색실행(한국,미국간 개봉일 차이때문에 시작하는 검색 시작하는 년도는 한국 개봉년도에-1을 해줌)
-        naverMovieRepository.getMovieResult(mContext, currentMovieDetails.getTitle(), ""+(Integer.parseInt(releaseYear)-1), releaseYear
+        naverMovieRepository.getMovieResult(mContext, currentMovieDetails.getTitle(), "" + (Integer.parseInt(releaseYear) - 1), releaseYear
                 , new OnGetNaverMovieCallback() {
                     @Override
                     public void onSuccess(NaverMovie.ItemsBean movieItem) {
@@ -223,30 +223,52 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
                         //영화 기본페이지 링크
                         String basicLink = movieItem.getLink();
                         //아이디만 추출
-                        String movieId = basicLink.replaceAll("[^0-9]","");
+                        String movieId = basicLink.replaceAll("[^0-9]", "");
                         //댓글 프래그먼트 로드
                         FrgMovieComments dialog = (FrgMovieComments.newInstance(movieId, 1));
-                        dialog.show(((MainActivity)mContext).getSupportFragmentManager(), null);
+                        dialog.show(((MainActivity) mContext).getSupportFragmentManager(), null);
 
                     }
 
                     @Override
-                    public void onError() {
-                        Toast.makeText(mContext, "네이버 댓글 로드에 실패하였습니다", Toast.LENGTH_SHORT).show();
+                    public void onError(Boolean research) {
+                        //개봉년도 포함하지 않고 재검색
+                        if (research) {
+                            naverMovieRepository.researchWithoutYearParams(mContext, currentMovieDetails.getTitle()
+                                    , new OnGetNaverMovieCallback() {
+                                        @Override
+                                        public void onSuccess(NaverMovie.ItemsBean movieItem) {
+                                            Log.d("네이버", movieItem.getLink());
+                                            //영화 기본페이지 링크
+                                            String basicLink = movieItem.getLink();
+                                            //아이디만 추출
+                                            String movieId = basicLink.replaceAll("[^0-9]", "");
+                                            //댓글 프래그먼트 로드
+                                            FrgMovieComments dialog = (FrgMovieComments.newInstance(movieId, 1));
+                                            dialog.show(((MainActivity) mContext).getSupportFragmentManager(), null);
+                                        }
+
+                                        @Override
+                                        public void onError(Boolean research) {
+                                            Toast.makeText(mContext, "네이버 댓글 로드에 실패하였습니다", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else
+                            Toast.makeText(mContext, "네이버 댓글 로드에 실패하였습니다", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    public void showDatabase(String tbl_name, String sort){
+    public void showDatabase(String tbl_name, String sort) {
         Cursor iCursor = dbOpenHelper.sortColumn(tbl_name, sort);
         Log.d("DbData", "DB Size: " + iCursor.getCount());
 
-        while(iCursor.moveToNext()){
+        while (iCursor.moveToNext()) {
 
             int tempMvId = iCursor.getInt(iCursor.getColumnIndex("mv_id"));
             String tempTitle = iCursor.getString(iCursor.getColumnIndex("title"));
             String tempPoster = iCursor.getString(iCursor.getColumnIndex("mv_poster"));
-            String Result = tempMvId +", "+ tempTitle +", "+ tempPoster;
+            String Result = tempMvId + ", " + tempTitle + ", " + tempPoster;
 
             Log.d("DbData", Result);
         }
@@ -272,7 +294,8 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
     }
 
     @Override
-    public void onCurrentItemChanged(@Nullable RecyclerView.ViewHolder viewHolder, int adapterPosition) {
+    public void onCurrentItemChanged(@Nullable RecyclerView.ViewHolder viewHolder,
+                                     int adapterPosition) {
         int positionInDataSet = infiniteAdapter.getRealPosition(adapterPosition);
         onMovieRcmChanged(list.get(positionInDataSet));
     }
@@ -365,10 +388,10 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
             boolean isExistLike = dbOpenHelper.isExistLikeColumn(movie_id);
             dbOpenHelper.close();
 
-            if(isExistLike) {
+            if (isExistLike) {
                 ibLike.setVisibility(View.VISIBLE);
                 ibUnlike.setVisibility(View.GONE);
-            }else{
+            } else {
                 ibLike.setVisibility(View.GONE);
                 ibUnlike.setVisibility(View.VISIBLE);
             }
@@ -386,8 +409,8 @@ public class FrgMovieDetails extends Fragment implements DiscreteScrollView.OnIt
             if (currentMovieDetails.getOverview().equals("")) {
                 tvOverview.setText("줄거리가 없습니다.");
 
-            }else {
-                String overview =  currentMovieDetails.getOverview();
+            } else {
+                String overview = currentMovieDetails.getOverview();
                 overview = overview.replace(" ", "\u00A0");
                 tvOverview.setText(overview);
             }
